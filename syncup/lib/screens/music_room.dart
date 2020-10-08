@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
-import 'main_screen.dart';
+import '../marquee.dart';
 
 class MusicRoom extends StatefulWidget {
-  static String route = 'music_room';
+  static String route = 'music';
 
   @override
   _MusicRoomState createState() => _MusicRoomState();
@@ -11,7 +11,9 @@ class MusicRoom extends StatefulWidget {
 
 class _MusicRoomState extends State<MusicRoom> {
   String _roomOwner = 'Group 15(Best Group)';
+  String songSource = 'Group 15';
   int _currentIndex = 1;
+  double songDuration = 220;
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +24,39 @@ class _MusicRoomState extends State<MusicRoom> {
       appBar: buildAppBar(),
       body: Container(
         decoration: opacityBackground(),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [buildSongImage(context)],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            _buildSongSource(),
+            _buildSongImage(context),
+          ],
         ),
       ),
       bottomNavigationBar: buildBottomNavigationBar(textTheme),
+    );
+  }
+
+  Padding _buildSongSource() {
+    double _maxWidth = MediaQuery.of(context).size.width * .8;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Container(
+        width: _maxWidth,
+        height: 20,
+        child: Center(
+          child: MarqueeWidget(
+            direction: Axis.horizontal,
+            child: Text(
+              songSource,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -68,12 +95,14 @@ class _MusicRoomState extends State<MusicRoom> {
     );
   }
 
-  Container buildSongImage(BuildContext context) {
+  Container _buildSongImage(BuildContext context) {
     return Container(
       width: double.infinity,
       child: Padding(
         padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * .1),
+          horizontal: MediaQuery.of(context).size.width * .1,
+          vertical: 12,
+        ),
         child: Image(
           fit: BoxFit.fill,
           image: AssetImage('assets/images/song_placeholder.png'),
