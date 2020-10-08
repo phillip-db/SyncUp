@@ -9,18 +9,25 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'SyncUp',
       theme: ThemeData(
         brightness: Brightness.dark,
-        backgroundColor: Colors.blue[500],
+        backgroundColor: Colors.grey[900],
         textTheme: TextTheme(
-            caption: TextStyle(
-          fontSize: 12,
-        )),
+          caption: TextStyle(
+            fontSize: 12,
+          ),
+          headline4: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
       initialRoute: LoginScreen.route,
       routes: getRoutes(),
@@ -30,6 +37,6 @@ class _MyAppState extends State<MyApp> {
 
 BoxDecoration opacityBackground() {
   return BoxDecoration(
-    color: Colors.black54,
+    color: Colors.white,
   );
 }
