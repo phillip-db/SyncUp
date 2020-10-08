@@ -58,6 +58,8 @@ class _MainScreenState extends State<MainScreen>
 
   @override
   Widget build(BuildContext context) {
+    double _buttonDimension = MediaQuery.of(context).size.width * 0.5;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -69,36 +71,73 @@ class _MainScreenState extends State<MainScreen>
             return Container(
               color: background
                   .evaluate(AlwaysStoppedAnimation(_controller.value)),
-              child: Container(
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    RaisedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          LoginScreen.route,
-                        );
-                      },
-                      child: Text('Go back!'),
-                    ),
-                    RaisedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          MusicRoom.route,
-                        );
-                      },
-                      child: Text('Enter Room'),
-                    ),
-                  ],
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.05),
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      NavigationButton(
+                        buttonDimension: _buttonDimension,
+                        navRoute: LoginScreen.route,
+                        buttonText: 'Go Back',
+                      ),
+                      NavigationButton(
+                        buttonDimension: _buttonDimension,
+                        navRoute: MusicRoom.route,
+                        buttonText: 'Join Room',
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
           }),
+    );
+  }
+}
+
+class NavigationButton extends StatelessWidget {
+  const NavigationButton({
+    Key key,
+    @required double buttonDimension,
+    @required this.navRoute,
+    @required this.buttonText,
+  })  : _buttonDimension = buttonDimension,
+        super(key: key);
+
+  final double _buttonDimension;
+  final navRoute;
+  final buttonText;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: _buttonDimension,
+      height: _buttonDimension,
+      child: RaisedButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_buttonDimension * 0.15),
+        ),
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            navRoute,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            buttonText,
+            textAlign: TextAlign.center,
+            textScaleFactor: 3,
+          ),
+        ),
+      ),
     );
   }
 }

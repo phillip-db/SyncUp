@@ -18,6 +18,10 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
       theme: ThemeData(
         brightness: Brightness.dark,
         backgroundColor: Colors.grey[900],
+        buttonTheme: ButtonThemeData(
+          buttonColor: Colors.blue[800],
+          textTheme: ButtonTextTheme.normal,
+        ),
         textTheme: TextTheme(
           caption: TextStyle(
             fontSize: 12,
