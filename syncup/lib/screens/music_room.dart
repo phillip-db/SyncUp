@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
 import '../marquee.dart';
+import '../members.dart';
 
 double maxWidthPct = 0.75;
 
@@ -21,11 +21,13 @@ class _MusicRoomState extends State<MusicRoom> {
   Widget build(BuildContext context) {
     String songTitle = 'CS 196';
     String songArtist = 'Sami & Rohan';
+    Color bgColor = Colors.black45;
+
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: buildAppBar(),
       body: Container(
-          color: Colors.black45,
+          color: bgColor,
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
@@ -42,11 +44,7 @@ class _MusicRoomState extends State<MusicRoom> {
                       width: MediaQuery.of(context).size.width * 0.7,
                       child: buildSongInfo(songTitle, songArtist),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.more_vert),
-                      tooltip: 'Song Options',
-                      onPressed: () {},
-                    ),
+                    SongOptionsButton(),
                   ],
                 ),
               ),
@@ -100,7 +98,7 @@ class _MusicRoomState extends State<MusicRoom> {
           child: MarqueeWidget(
             direction: Axis.horizontal,
             child: Text(
-              songSource,
+              'DJ: $songSource',
               style: Theme.of(context).textTheme.headline4,
             ),
           ),
@@ -136,11 +134,7 @@ class _MusicRoomState extends State<MusicRoom> {
       centerTitle: true,
       title: Text(_roomOwner + '\'s Room'),
       actions: [
-        IconButton(
-          icon: Icon(Icons.people),
-          tooltip: 'Room Members',
-          onPressed: () {},
-        ),
+        MemberList(),
       ],
     );
   }
@@ -166,10 +160,90 @@ class _MusicRoomState extends State<MusicRoom> {
   }
 }
 
-class PlaybackControls extends StatelessWidget {
-  const PlaybackControls({
+class SongOptionsButton extends StatelessWidget {
+  const SongOptionsButton({
     Key key,
   }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      icon: Icon(Icons.more_vert),
+      tooltip: 'Song Options',
+      onSelected: (value) {},
+      itemBuilder: (BuildContext context) => [
+        PopupMenuItem(
+          value: 1,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Find on Spotify'),
+              Icon(Icons.speaker),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 2,
+          child: Text('Option 2'),
+        ),
+        PopupMenuItem(
+          value: 3,
+          child: Text('Option 3'),
+        ),
+      ],
+    );
+  }
+}
+
+class MemberList extends StatelessWidget {
+  const MemberList({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      offset: Offset(1, MediaQuery.of(context).size.height),
+      icon: Icon(Icons.people),
+      onSelected: (value) {},
+      itemBuilder: (BuildContext context) {
+        return Members.members.map((String member) {
+          return PopupMenuItem<String>(
+            value: member,
+            child: Container(
+              child: Row(
+                children: [
+                  Icon(Icons.person),
+                  Flexible(
+                    child: Container(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        member,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList();
+      },
+    );
+  }
+}
+
+class PlaybackControls extends StatefulWidget {
+  _PlaybackControlsState createState() => _PlaybackControlsState();
+}
+
+class _PlaybackControlsState extends State<PlaybackControls> {
+  Duration _songDuration = Duration(minutes: 3, seconds: 40);
+  Duration _songProgress = Duration(minutes: 2, seconds: 30);
+
+  format(Duration d) => d.toString().substring(2, 7);
+  minToSec(Duration d) => 60 * int.parse(d.toString().substring(2, 4));
+  seconds(Duration d) => minToSec(d) + int.parse(d.toString().substring(5, 7));
 
   @override
   Widget build(BuildContext context) {
@@ -177,12 +251,11 @@ class PlaybackControls extends StatelessWidget {
       widthFactor: 0.9,
       heightFactor: 1.0,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5),
             child: LinearProgressIndicator(
-              value: 0.8,
+              value: seconds(_songProgress) / seconds(_songDuration),
               backgroundColor: Colors.grey,
               valueColor: AlwaysStoppedAnimation(Colors.white),
             ),
@@ -190,8 +263,8 @@ class PlaybackControls extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('0:00'),
-              Text('3:00'),
+              Text(format(_songProgress)),
+              Text(format(_songDuration - _songProgress)),
             ],
           ),
           PlaybackButton(),
@@ -259,21 +332,33 @@ class _SongListButton extends State<SongListButton> {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      padding: EdgeInsets.all(0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Swipe'),
-          Icon(
-              _isSongListShowing ? Icons.arrow_drop_up : Icons.arrow_drop_down),
-        ],
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onVerticalDragUpdate: (DragUpdateDetails details) {
+        _toggleSongList(details.delta.dy);
+      },
+      child: Container(
+        width: double.infinity,
+        padding:
+            EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Swipe'),
+            Icon(_isSongListShowing
+                ? Icons.arrow_drop_up
+                : Icons.arrow_drop_down),
+          ],
+        ),
       ),
-      onPressed: _toggleSongList,
     );
   }
 
-  void _toggleSongList() {
-    setState(() => _isSongListShowing = !_isSongListShowing);
+  void _toggleSongList(double dy) {
+    if (dy < -2) {
+      setState(() => _isSongListShowing = true);
+    } else if (dy > 2) {
+      setState(() => _isSongListShowing = false);
+    }
   }
 }
