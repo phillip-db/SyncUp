@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../marquee.dart';
 import '../members.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 double maxWidthPct = 0.75;
 
@@ -26,41 +27,79 @@ class _MusicRoomState extends State<MusicRoom> {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: buildAppBar(),
-      body: Container(
-          color: bgColor,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              _buildSongSource(),
-              _buildSongImage(context),
-              Container(
-                height: MediaQuery.of(context).size.height * 0.1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    VoteSkipButton(),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      child: buildSongInfo(songTitle, songArtist),
-                    ),
-                    SongOptionsButton(),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  child: PlaybackControls(),
-                ),
-              ),
-            ],
-          )),
+      body: mainBody(context, songTitle, songArtist, bgColor),
       bottomNavigationBar: FractionallySizedBox(
         heightFactor: 0.07,
         child: buildBottomNavigationBar(context),
       ),
     );
   }
+
+  Container mainContainer(String songTitle, String songArtist, Color bgColor) {
+    return Container(
+        color: bgColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            _buildSongSource(),
+            _buildSongImage(context),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  VoteSkipButton(),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: buildSongInfo(songTitle, songArtist),
+                  ),
+                  SongOptionsButton(),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                child: PlaybackControls(),
+              ),
+            ),
+          ],
+        ));
+  }
+
+  SlidingUpPanel mainBody(BuildContext context, String songTitle, String songArtist, Color bgColor) {
+    return SlidingUpPanel(
+        minHeight: 50,
+        maxHeight: MediaQuery.of(context).size.height,
+        panelBuilder: (scrollController) => buildSlidingPanel(
+              scrollController: scrollController,
+            ),
+        body: mainContainer(songTitle, songArtist, bgColor));
+  }
+
+  Widget buildSlidingPanel({
+    @required ScrollController scrollController,
+  }) =>
+      DefaultTabController(
+          length: 1,
+          child: Scaffold(
+              appBar: buildSlidingPanelBar(),
+              body: TabBarView(
+                children: [
+                  ScrollUpPanel(scrollController: scrollController),
+                ]
+              )
+          )
+      );
+
+  Widget buildSlidingPanelBar() => PreferredSize(
+      preferredSize: Size.fromHeight(30),
+      child: AppBar(
+        title: Icon(Icons.drag_handle),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        )
+      );
 
   Column buildSongInfo(String songTitle, String songArtist) {
     return Column(
@@ -268,7 +307,6 @@ class _PlaybackControlsState extends State<PlaybackControls> {
             ],
           ),
           PlaybackButton(),
-          SongListButton(),
         ],
       ),
     );
@@ -322,43 +360,125 @@ class _PlaybackButtonState extends State<PlaybackButton> {
   }
 }
 
-class SongListButton extends StatefulWidget {
+class ScrollUpPanel extends StatelessWidget {
+  const ScrollUpPanel({
+    Key key,
+    @required this.scrollController,
+  }) : super(key: key);
+  final ScrollController scrollController;
+
   @override
-  _SongListButton createState() => _SongListButton();
+  Widget build(BuildContext context) => ListView(
+    padding: EdgeInsets.all(30),
+    controller: scrollController,
+    children: [
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          currentlyPlaying('CS 196','Sami & Rohan'),
+          Container(
+            padding: const EdgeInsets.only(top: 20),
+            child: Text(
+              'Up Next',
+              style: TextStyle(
+                color: Colors.cyan,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              )
+            )
+          ),
+          addSongUpNext('Example title', 'Example artist'),
+          addSongUpNext('Example title 2', 'Example artist 2'),
+          addSongUpNext('Example title 3', 'Example artist 2'),
+          addSongUpNext('Example title 4', 'Example artist 2'),
+          addSongUpNext('Example title 5', 'Example artist 2'),
+          addSongUpNext('Example title 5', 'Example artist 2'),
+        ]
+      )
+    ]
+  );
 }
 
-class _SongListButton extends State<SongListButton> {
-  bool _isSongListShowing = false;
+Widget currentlyPlaying(String song, String artist) {
+  return Container(
+    child: Row(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 5, top: 10),
+                child: Image.asset(
+                  'assets/images/song_placeholder.png',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                )
+              ),
+              Container(
+                padding: const EdgeInsets.only(left: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        song,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(top: 3),
+                      child: Text(
+                        artist,
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ]
+                )
+              )
+            ],
+          ) 
+        )
+      ],
+    )
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onVerticalDragUpdate: (DragUpdateDetails details) {
-        _toggleSongList(details.delta.dy);
-      },
-      child: Container(
-        width: double.infinity,
-        padding:
-            EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Swipe'),
-            Icon(_isSongListShowing
-                ? Icons.arrow_drop_up
-                : Icons.arrow_drop_down),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _toggleSongList(double dy) {
-    if (dy < -2) {
-      setState(() => _isSongListShowing = true);
-    } else if (dy > 2) {
-      setState(() => _isSongListShowing = false);
-    }
-  }
+  );
+}
+Widget addSongUpNext(String song, String artist) {
+  return Container(
+    child: Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(top: 20),
+                child: Text(
+                  song,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(top: 3),
+                child: Text(
+                  artist,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            ],
+    ))
+  ]));
 }
