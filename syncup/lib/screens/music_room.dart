@@ -67,10 +67,11 @@ class _MusicRoomState extends State<MusicRoom> {
         ));
   }
 
-  SlidingUpPanel mainBody(BuildContext context, String songTitle, String songArtist, Color bgColor) {
+  SlidingUpPanel mainBody(BuildContext context, String songTitle,
+      String songArtist, Color bgColor) {
     return SlidingUpPanel(
         minHeight: 50,
-        maxHeight: MediaQuery.of(context).size.height,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
         panelBuilder: (scrollController) => buildSlidingPanel(
               scrollController: scrollController,
             ),
@@ -84,13 +85,9 @@ class _MusicRoomState extends State<MusicRoom> {
           length: 1,
           child: Scaffold(
               appBar: buildSlidingPanelBar(),
-              body: TabBarView(
-                children: [
-                  ScrollUpPanel(scrollController: scrollController),
-                ]
-              )
-          )
-      );
+              body: TabBarView(children: [
+                ScrollUpPanel(scrollController: scrollController),
+              ])));
 
   Widget buildSlidingPanelBar() => PreferredSize(
       preferredSize: Size.fromHeight(30),
@@ -98,8 +95,7 @@ class _MusicRoomState extends State<MusicRoom> {
         title: Icon(Icons.drag_handle),
         centerTitle: true,
         automaticallyImplyLeading: false,
-        )
-      );
+      ));
 
   Column buildSongInfo(String songTitle, String songArtist) {
     return Column(
@@ -369,34 +365,41 @@ class ScrollUpPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-    padding: EdgeInsets.all(30),
-    controller: scrollController,
-    children: [
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        padding: EdgeInsets.all(30),
+        controller: scrollController,
         children: [
-          currentlyPlaying('CS 196','Sami & Rohan'),
-          Container(
-            padding: const EdgeInsets.only(top: 20),
-            child: Text(
-              'Up Next',
-              style: TextStyle(
-                color: Colors.cyan,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              )
-            )
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              currentlyPlaying('CS 196', 'Sami & Rohan'),
+              Container(
+                padding: const EdgeInsets.only(top: 20),
+                child: Text(
+                  'Up Next',
+                  style: TextStyle(
+                    color: Colors.cyan,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              addSongUpNext('Example title', 'Example artist'),
+              addSongUpNext('Example title 2', 'Example artist 2'),
+              addSongUpNext('Example title 3', 'Example artist 2'),
+              addSongUpNext('Example title 4', 'Example artist 2'),
+              addSongUpNext('Example title 5', 'Example artist 2'),
+              addSongUpNext('Example title 5', 'Example artist 2'),
+              addSongUpNext('Example title 6', 'Example artist 2'),
+              addSongUpNext('Example title 7', 'Example artist 2'),
+              addSongUpNext('Example title 8', 'Example artist 2'),
+              addSongUpNext('Example title 9', 'Example artist 2'),
+              addSongUpNext('Example title 10', 'Example artist 2'),
+              addSongUpNext('Example long long long long long long title',
+                  'Example long long long long long long long long long long artist'),
+            ],
           ),
-          addSongUpNext('Example title', 'Example artist'),
-          addSongUpNext('Example title 2', 'Example artist 2'),
-          addSongUpNext('Example title 3', 'Example artist 2'),
-          addSongUpNext('Example title 4', 'Example artist 2'),
-          addSongUpNext('Example title 5', 'Example artist 2'),
-          addSongUpNext('Example title 5', 'Example artist 2'),
-        ]
-      )
-    ]
-  );
+        ],
+      );
 }
 
 Widget currentlyPlaying(String song, String artist) {
@@ -407,13 +410,13 @@ Widget currentlyPlaying(String song, String artist) {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.only(left: 5, top: 10),
+                padding: const EdgeInsets.only(top: 10),
                 child: Image.asset(
                   'assets/images/song_placeholder.png',
                   width: 50,
                   height: 50,
                   fit: BoxFit.cover,
-                )
+                ),
               ),
               Container(
                 padding: const EdgeInsets.only(left: 10),
@@ -421,64 +424,85 @@ Widget currentlyPlaying(String song, String artist) {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      child: Text(
-                        song,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
+                      child: MarqueeWidget(
+                        child: Text(
+                          song,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                          ),
                         ),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.only(top: 3),
-                      child: Text(
-                        artist,
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 13,
+                      child: MarqueeWidget(
+                        child: Text(
+                          artist,
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
-                  ]
-                )
-              )
+                  ],
+                ),
+              ),
             ],
-          ) 
-        )
+          ),
+        ),
+        SongOptionsButton(),
       ],
-    )
-
+    ),
   );
 }
+
 Widget addSongUpNext(String song, String artist) {
   return Container(
+    padding: EdgeInsets.only(top: 15),
     child: Row(
       children: [
+        Container(
+          padding: EdgeInsets.only(right: 10),
+          child: Image.asset(
+            'assets/images/song_placeholder.png',
+            width: 40,
+            fit: BoxFit.cover,
+          ),
+        ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.only(top: 20),
-                child: Text(
-                  song,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
+                child: MarqueeWidget(
+                  child: Text(
+                    song,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                    ),
                   ),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.only(top: 3),
-                child: Text(
-                  artist,
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 10,
+                child: MarqueeWidget(
+                  child: Text(
+                    artist,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 10,
+                    ),
                   ),
                 ),
               ),
             ],
-    ))
-  ]));
+          ),
+        ),
+        SongOptionsButton(),
+      ],
+    ),
+  );
 }
