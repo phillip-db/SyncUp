@@ -12,10 +12,9 @@ class MusicRoom extends StatefulWidget {
 }
 
 class _MusicRoomState extends State<MusicRoom> {
-  String _roomOwner = 'Group 15(Best Group)';
+  String _roomOwner = 'Admin';
   String songSource = 'Group 15';
   int _currentIndex = 1;
-  double songDuration = 220;
 
   @override
   Widget build(BuildContext context) {
@@ -190,6 +189,15 @@ class SongOptionsButton extends StatelessWidget {
           value: 3,
           child: Text('Option 3'),
         ),
+        PopupMenuItem(
+            value: 4,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Skip Song'),
+                Icon(Icons.skip_next),
+              ],
+            )),
       ],
     );
   }
@@ -203,6 +211,7 @@ class MemberList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
+      tooltip: 'Member List',
       offset: Offset(1, MediaQuery.of(context).size.height),
       icon: Icon(Icons.people),
       onSelected: (value) {},
@@ -210,26 +219,67 @@ class MemberList extends StatelessWidget {
         return Members.members.map((String member) {
           return PopupMenuItem<String>(
             value: member,
-            child: Container(
-              child: Row(
-                children: [
-                  Icon(Icons.person),
-                  Flexible(
-                    child: Container(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        member,
-                        overflow: TextOverflow.ellipsis,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onLongPress: () {
+                showUserOptions(context, member);
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Row(
+                  children: [
+                    Icon(Icons.person),
+                    Flexible(
+                      child: Container(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          member,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
         }).toList();
       },
     );
+  }
+
+  Future showUserOptions(BuildContext context, String member) {
+    return showMenu(
+        context: context,
+        position: RelativeRect.fromLTRB(
+            0, MediaQuery.of(context).size.height * 0.117, 0, 0),
+        items: <PopupMenuEntry>[
+          PopupMenuItem(
+            child: Container(
+              child: Text(member),
+              padding: EdgeInsets.all(8),
+              width: MediaQuery.of(context).size.width * 0.15,
+            ),
+          ),
+          PopupMenuDivider(
+            height: 5,
+          ),
+          PopupMenuItem(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('DJ'),
+                Icon(Icons.check),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            child: Text('Kick'),
+          ),
+          PopupMenuItem(
+            child: Text('Ban'),
+          ),
+        ]);
   }
 }
 
@@ -267,13 +317,27 @@ class _PlaybackControlsState extends State<PlaybackControls> {
               Text(format(_songDuration - _songProgress)),
             ],
           ),
-          PlaybackButton(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              PlaybackButton(),
+              IconButton(
+                padding: EdgeInsets.all(0),
+                icon: Icon(Icons.skip_next),
+                iconSize: 40,
+                tooltip: 'Skip Song',
+                onPressed: () {},
+              )
+            ],
+          ),
           SongListButton(),
         ],
       ),
     );
   }
 }
+
+class SkipButton {}
 
 class VoteSkipButton extends StatefulWidget {
   @override
