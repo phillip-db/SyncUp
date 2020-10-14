@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main_screen.dart';
+import 'package:syncup/screens/main_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatelessWidget {
   static String route = "login";
@@ -41,7 +43,15 @@ class LoginScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: GestureDetector(
-                onTap: () => Navigator.pushNamed(context, MainScreen.route),
+                onTap: () async {
+                  const url = 'https://www.spotify.com';
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                    Navigator.pushNamed(context, MainScreen.route);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.4,
                   child: Image(
@@ -59,10 +69,20 @@ class LoginScreen extends StatelessWidget {
             ),
             Container(
               width: MediaQuery.of(context).size.width * 0.5,
-              child: Text(
-                'By logging in, you agree to the SyncUp Terms of Service',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12),
+              child: new InkWell(
+                child: new Text(
+                  'By logging in, you agree to the SyncUp Terms of Service',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12),
+                ),
+                onTap: () async {
+                  const url = 'http://cs196.cs.illinois.edu/';
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
               ),
             ),
           ],
