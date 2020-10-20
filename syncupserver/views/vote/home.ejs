@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Vote</title>
+</head>
+<body>
+  <h1>Join Room: </h1>
+  <ul>
+    <% for (x in songdata) { %>
+      <li><a href="/vote/<%= x %>"><%= x %></a></li>
+    <% } %>
+  </ul>
+  <form action="/vote" method="post">
+    <h2>New Room</h2>
+    <label for="roomname">Room Name: </label><input name="roomname" type="text">
+    <input type="submit" value="Create Room">
+  </form>
+
+</body>
+</html>
