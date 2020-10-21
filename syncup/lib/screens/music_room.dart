@@ -235,33 +235,10 @@ class MemberListDrawer extends StatefulWidget {
 class _MemberListDrawerState extends State<MemberListDrawer> {
   @override
   Widget build(BuildContext context) {
-    List<dynamic> items = [
-      Container(
-        color: Colors.grey[900],
-        height: MediaQuery.of(context).size.height * 0.1,
-        child: DrawerHeader(
-          margin: EdgeInsets.zero,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            textDirection: TextDirection.ltr,
-            children: [
-              Text(
-                'Room Members',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ];
-
-    List roomMembers = Members.members.map(
+    List<ListTile> roomMembers = Members.members.map(
       (String member) {
         return ListTile(
+          visualDensity: VisualDensity(vertical: 2),
           title: Container(
             child: Row(
               children: [
@@ -288,15 +265,42 @@ class _MemberListDrawerState extends State<MemberListDrawer> {
       },
     ).toList();
 
-    items.addAll(roomMembers);
-
     return Container(
       child: Drawer(
-        child: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Container(child: items[index]);
-          },
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              color: Colors.grey[900],
+              height: MediaQuery.of(context).size.height * 0.15,
+              child: DrawerHeader(
+                margin: EdgeInsets.zero,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  textDirection: TextDirection.ltr,
+                  children: [
+                    Text(
+                      'Room Members',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.only(top: 0),
+                itemCount: roomMembers.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(child: roomMembers[index]);
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
