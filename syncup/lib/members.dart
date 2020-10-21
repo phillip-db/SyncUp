@@ -1,8 +1,27 @@
 class Members {
-  static const List<String> members = <String>[
-    "User1",
-    "User2",
-    "User3",
-    "User with a long long long long name",
+  static List<String> members = <String>[
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
+    "User",
   ];
+
+  static void addUser(String user) {
+    members.add(user);
+  }
+
+  static void removeUser(int index) {
+    members.removeAt(index);
+  }
 }

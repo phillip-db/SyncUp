@@ -27,11 +27,12 @@ class _MusicRoomState extends State<MusicRoom> {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: buildAppBar(),
+      endDrawer: MemberListDrawer(),
       body: mainBody(context, songTitle, songArtist, bgColor),
-      bottomNavigationBar: FractionallySizedBox(
-        heightFactor: 0.07,
-        child: buildBottomNavigationBar(context),
-      ),
+      // bottomNavigationBar: FractionallySizedBox(
+      //   heightFactor: 0.07,
+      //   child: buildBottomNavigationBar(context),
+      // ),
     );
   }
 
@@ -41,8 +42,8 @@ class _MusicRoomState extends State<MusicRoom> {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            _buildSongSource(),
-            _buildSongImage(context),
+            SongSource(songSource: songSource),
+            SongImage(),
             Container(
               height: MediaQuery.of(context).size.height * 0.1,
               child: Row(
@@ -70,8 +71,8 @@ class _MusicRoomState extends State<MusicRoom> {
   SlidingUpPanel mainBody(BuildContext context, String songTitle,
       String songArtist, Color bgColor) {
     return SlidingUpPanel(
-        minHeight: 50,
-        maxHeight: MediaQuery.of(context).size.height * 0.85,
+        minHeight: 30,
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
         panelBuilder: (scrollController) => buildSlidingPanel(
               scrollController: scrollController,
             ),
@@ -82,20 +83,25 @@ class _MusicRoomState extends State<MusicRoom> {
     @required ScrollController scrollController,
   }) =>
       DefaultTabController(
-          length: 1,
-          child: Scaffold(
-              appBar: buildSlidingPanelBar(),
-              body: TabBarView(children: [
-                ScrollUpPanel(scrollController: scrollController),
-              ])));
+        length: 1,
+        child: Scaffold(
+          appBar: buildSlidingPanelBar(),
+          body: TabBarView(
+            children: [
+              ScrollUpPanel(scrollController: scrollController),
+            ],
+          ),
+        ),
+      );
 
   Widget buildSlidingPanelBar() => PreferredSize(
-      preferredSize: Size.fromHeight(30),
-      child: AppBar(
-        title: Icon(Icons.drag_handle),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ));
+        preferredSize: Size.fromHeight(30),
+        child: AppBar(
+          title: Icon(Icons.drag_handle),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+        ),
+      );
 
   Column buildSongInfo(String songTitle, String songArtist) {
     return Column(
@@ -118,27 +124,6 @@ class _MusicRoomState extends State<MusicRoom> {
           ),
         )),
       ],
-    );
-  }
-
-  Padding _buildSongSource() {
-    double _maxWidth = MediaQuery.of(context).size.width * maxWidthPct;
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Container(
-        width: _maxWidth,
-        height: 20,
-        child: Center(
-          child: MarqueeWidget(
-            direction: Axis.horizontal,
-            child: Text(
-              'DJ: $songSource',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -168,15 +153,58 @@ class _MusicRoomState extends State<MusicRoom> {
     return AppBar(
       centerTitle: true,
       title: Text(_roomOwner + '\'s Room'),
-      actions: [
-        MemberList(),
-      ],
     );
   }
+}
 
-  Container _buildSongImage(BuildContext context) {
+class SongSource extends StatefulWidget {
+  SongSource({
+    Key key,
+    @required this.songSource,
+  }) : super(key: key);
+
+  final String songSource;
+
+  @override
+  _SongSourceState createState() => _SongSourceState();
+}
+
+class _SongSourceState extends State<SongSource> {
+  @override
+  Widget build(BuildContext context) {
+    double _maxWidth = MediaQuery.of(context).size.width * maxWidthPct;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Container(
+        width: _maxWidth,
+        height: 20,
+        child: Center(
+          child: MarqueeWidget(
+            direction: Axis.horizontal,
+            child: Text(
+              'DJ: ${widget.songSource}',
+              style: Theme.of(context).textTheme.headline4,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SongImage extends StatefulWidget {
+  SongImage({Key key}) : super(key: key);
+
+  @override
+  _SongImageState createState() => _SongImageState();
+}
+
+class _SongImageState extends State<SongImage> {
+  @override
+  Widget build(BuildContext context) {
     double _horizontalPadding =
-        MediaQuery.of(context).size.width * ((1 - maxWidthPct) / 2);
+        MediaQuery.of(context).size.width * ((1 - maxWidthPct) / 3.5);
 
     return Container(
       width: double.infinity,
@@ -195,11 +223,92 @@ class _MusicRoomState extends State<MusicRoom> {
   }
 }
 
-class SongOptionsButton extends StatelessWidget {
-  const SongOptionsButton({
+class MemberListDrawer extends StatefulWidget {
+  MemberListDrawer({
     Key key,
   }) : super(key: key);
 
+  @override
+  _MemberListDrawerState createState() => _MemberListDrawerState();
+}
+
+class _MemberListDrawerState extends State<MemberListDrawer> {
+  @override
+  Widget build(BuildContext context) {
+    List<dynamic> items = [
+      Container(
+        color: Colors.grey[900],
+        height: MediaQuery.of(context).size.height * 0.1,
+        child: DrawerHeader(
+          margin: EdgeInsets.zero,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            textDirection: TextDirection.ltr,
+            children: [
+              Text(
+                'Room Members',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ];
+
+    List roomMembers = Members.members.map(
+      (String member) {
+        return ListTile(
+          title: Container(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.person,
+                  size: 30,
+                ),
+                Flexible(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      member,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ).toList();
+
+    items.addAll(roomMembers);
+
+    return Container(
+      child: Drawer(
+        child: ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(child: items[index]);
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class SongOptionsButton extends StatefulWidget {
+  @override
+  _SongOptionsButtonState createState() => _SongOptionsButtonState();
+}
+
+class _SongOptionsButtonState extends State<SongOptionsButton> {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
@@ -219,51 +328,25 @@ class SongOptionsButton extends StatelessWidget {
         ),
         PopupMenuItem(
           value: 2,
-          child: Text('Option 2'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Upvote'),
+              Icon(Icons.keyboard_arrow_up),
+            ],
+          ),
         ),
         PopupMenuItem(
           value: 3,
-          child: Text('Option 3'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Downvote'),
+              Icon(Icons.keyboard_arrow_down),
+            ],
+          ),
         ),
       ],
-    );
-  }
-}
-
-class MemberList extends StatelessWidget {
-  const MemberList({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<String>(
-      offset: Offset(1, MediaQuery.of(context).size.height),
-      icon: Icon(Icons.people),
-      onSelected: (value) {},
-      itemBuilder: (BuildContext context) {
-        return Members.members.map((String member) {
-          return PopupMenuItem<String>(
-            value: member,
-            child: Container(
-              child: Row(
-                children: [
-                  Icon(Icons.person),
-                  Flexible(
-                    child: Container(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        member,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }).toList();
-      },
     );
   }
 }
