@@ -21,7 +21,7 @@ class _MusicRoomState extends State<MusicRoom> {
   @override
   Widget build(BuildContext context) {
     String songTitle = 'CS 196';
-    String songArtist = 'Sami & Rohan';
+    String songArtist = 'Sami & Rohan (ft. Course Staff)';
     Color bgColor = Colors.black45;
 
     return Scaffold(
@@ -153,6 +153,16 @@ class _MusicRoomState extends State<MusicRoom> {
     return AppBar(
       centerTitle: true,
       title: Text(_roomOwner + '\'s Room'),
+      actions: [
+        Builder(
+          builder: (context) => IconButton(
+              icon: Icon(
+                Icons.people,
+                size: 30,
+              ),
+              onPressed: () => Scaffold.of(context).openEndDrawer()),
+        ),
+      ],
     );
   }
 }
@@ -458,7 +468,7 @@ class ScrollUpPanel extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              currentlyPlaying('CS 196', 'Sami & Rohan'),
+              currentlyPlaying('CS 196', 'Sami & Rohan (ft. Course Staff)'),
               Container(
                 padding: const EdgeInsets.only(top: 20),
                 child: Text(
