@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import '../marquee.dart';
 import '../members.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 double maxWidthPct = 0.75;
+List<Song> songs = [];
 
 class MusicRoom extends StatefulWidget {
   static String route = 'music';
@@ -24,15 +26,13 @@ class _MusicRoomState extends State<MusicRoom> {
     String songArtist = 'Sami & Rohan (ft. Course Staff)';
     Color bgColor = Colors.black45;
 
+    setSongs();
+
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: buildAppBar(),
       endDrawer: MemberListDrawer(),
       body: mainBody(context, songTitle, songArtist, bgColor),
-      // bottomNavigationBar: FractionallySizedBox(
-      //   heightFactor: 0.07,
-      //   child: buildBottomNavigationBar(context),
-      // ),
     );
   }
 
@@ -71,37 +71,71 @@ class _MusicRoomState extends State<MusicRoom> {
   SlidingUpPanel mainBody(BuildContext context, String songTitle,
       String songArtist, Color bgColor) {
     return SlidingUpPanel(
-        minHeight: 30,
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
-        panelBuilder: (scrollController) => buildSlidingPanel(
-              scrollController: scrollController,
-            ),
+        color: Colors.grey[850],
+        minHeight: 60,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
+        backdropOpacity: 1.0,
+        parallaxEnabled: true,
+        parallaxOffset: .5,
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0)),
+        panelBuilder: (scrollController) => buildSlidingPanel(scrollController),
         body: mainContainer(songTitle, songArtist, bgColor));
   }
 
-  Widget buildSlidingPanel({
-    @required ScrollController scrollController,
-  }) =>
-      DefaultTabController(
-        length: 1,
-        child: Scaffold(
-          appBar: buildSlidingPanelBar(),
-          body: TabBarView(
-            children: [
-              ScrollUpPanel(scrollController: scrollController),
+  Widget buildSlidingPanel(ScrollController sc) {
+    return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: ListView(controller: sc, children: <Widget>[
+          SizedBox(height: 30.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 30,
+                height: 5,
+                decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.all(Radius.circular(12.0))),
+              ),
             ],
           ),
-        ),
-      );
-
-  Widget buildSlidingPanelBar() => PreferredSize(
-        preferredSize: Size.fromHeight(30),
-        child: AppBar(
-          title: Icon(Icons.drag_handle),
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-        ),
-      );
+          SizedBox(
+            height: 18.0,
+          ),
+          currentlyPlaying(new Song(
+              'CS 196', 'Sami & Rohan (ft. Course Staff)', 'assets/images/song_placeholder.png')),
+          SizedBox(
+            height: 18.0,
+          ),
+          Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(
+                'Up Next',
+                style: TextStyle(
+                  color: Colors.cyan,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              )),
+          SizedBox(
+            height: 5.0,
+          ),
+          Container(
+              child: Column(
+                children: songs
+                  .map((i) => new SlidableWidget(
+                    child: UpcomingSongList(song: i),
+                    key: Key('i.name ' + i.artist),
+                    song: i
+                  )).toList()
+              )
+          ),
+        ]
+      )
+    );
+  }
 
   Column buildSongInfo(String songTitle, String songArtist) {
     return Column(
@@ -123,28 +157,6 @@ class _MusicRoomState extends State<MusicRoom> {
             color: Colors.grey,
           ),
         )),
-      ],
-    );
-  }
-
-  BottomNavigationBar buildBottomNavigationBar(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return BottomNavigationBar(
-      selectedLabelStyle: textTheme.caption,
-      unselectedLabelStyle: textTheme.caption,
-      currentIndex: _currentIndex,
-      onTap: (value) {
-        setState(() => _currentIndex = value);
-      },
-      items: [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home, size: 20),
-          title: Text('Home'),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.music_note, size: 20),
-          title: Text('Music Room'),
-        ),
       ],
     );
   }
@@ -453,53 +465,7 @@ class _PlaybackButtonState extends State<PlaybackButton> {
   }
 }
 
-class ScrollUpPanel extends StatelessWidget {
-  const ScrollUpPanel({
-    Key key,
-    @required this.scrollController,
-  }) : super(key: key);
-  final ScrollController scrollController;
-
-  @override
-  Widget build(BuildContext context) => ListView(
-        padding: EdgeInsets.all(30),
-        controller: scrollController,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              currentlyPlaying('CS 196', 'Sami & Rohan (ft. Course Staff)'),
-              Container(
-                padding: const EdgeInsets.only(top: 20),
-                child: Text(
-                  'Up Next',
-                  style: TextStyle(
-                    color: Colors.cyan,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              addSongUpNext('Example title', 'Example artist'),
-              addSongUpNext('Example title 2', 'Example artist 2'),
-              addSongUpNext('Example title 3', 'Example artist 2'),
-              addSongUpNext('Example title 4', 'Example artist 2'),
-              addSongUpNext('Example title 5', 'Example artist 2'),
-              addSongUpNext('Example title 5', 'Example artist 2'),
-              addSongUpNext('Example title 6', 'Example artist 2'),
-              addSongUpNext('Example title 7', 'Example artist 2'),
-              addSongUpNext('Example title 8', 'Example artist 2'),
-              addSongUpNext('Example title 9', 'Example artist 2'),
-              addSongUpNext('Example title 10', 'Example artist 2'),
-              addSongUpNext('Example long long long long long long title',
-                  'Example long long long long long long long long long long artist'),
-            ],
-          ),
-        ],
-      );
-}
-
-Widget currentlyPlaying(String song, String artist) {
+Widget currentlyPlaying(Song song) {
   return Container(
     child: Row(
       children: [
@@ -507,11 +473,11 @@ Widget currentlyPlaying(String song, String artist) {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 10, left: 10),
                 child: Image.asset(
-                  'assets/images/song_placeholder.png',
-                  width: 50,
-                  height: 50,
+                  song.imagePath,
+                  width: 60,
+                  height: 60,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -523,10 +489,11 @@ Widget currentlyPlaying(String song, String artist) {
                     Container(
                       child: MarqueeWidget(
                         child: Text(
-                          song,
+                          song.name,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -535,10 +502,10 @@ Widget currentlyPlaying(String song, String artist) {
                       padding: const EdgeInsets.only(top: 3),
                       child: MarqueeWidget(
                         child: Text(
-                          artist,
+                          song.artist,
                           style: TextStyle(
                             color: Colors.grey,
-                            fontSize: 13,
+                            fontSize: 15,
                           ),
                         ),
                       ),
@@ -549,57 +516,229 @@ Widget currentlyPlaying(String song, String artist) {
             ],
           ),
         ),
-        SongOptionsButton(),
       ],
     ),
   );
 }
 
-Widget addSongUpNext(String song, String artist) {
-  return Container(
-    padding: EdgeInsets.only(top: 15),
-    child: Row(
-      children: [
-        Container(
-          padding: EdgeInsets.only(right: 10),
-          child: Image.asset(
-            'assets/images/song_placeholder.png',
+class Song {
+  String name;
+  String artist;
+  String imagePath;
+  bool upvoted = false;
+  bool downvoted = false;
+
+  Song(String name, String artist, String imagePath) {
+    this.name = name;
+    this.artist = artist;
+    this.imagePath = imagePath;
+  }
+
+  void upvote() {
+    upvoted = true;
+    downvoted = false;
+  }
+
+  void downvote() {
+    downvoted = true;
+    upvoted = false;
+  }
+}
+
+void setSongs() {
+  // For Testing:
+  for (int i = 1; i <= 20; i++) {
+    Song newSong = new Song('This is Example Song ' + i.toString(),
+        'artist ' + i.toString(), 'assets/images/song_placeholder.png');
+    songs.add(newSong);
+  }
+  Song longSong = new Song(
+      'Example long long long long long long title',
+      'Example long long long long long long long long long long artist',
+      'assets/images/song_placeholder.png');
+  songs.add(longSong);
+}
+
+class UpcomingSongList extends StatefulWidget {
+  final Song song;
+
+  const UpcomingSongList({@required this.song, key}) : super(key: key);
+
+  @override
+  _UpcomingSongListState createState() => _UpcomingSongListState(song: song);
+}
+
+class _UpcomingSongListState extends State<UpcomingSongList> {
+  final Song song;
+
+  _UpcomingSongListState({
+    Key key,
+    @required this.song,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        padding: EdgeInsets.only(left: 7),
+        height: 70.0,
+        color: Colors.grey[850],
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 3,
+            vertical: 3,
+          ),
+          leading: Image.asset(
+            song.imagePath,
             width: 40,
             fit: BoxFit.cover,
           ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          title: Row(
             children: [
-              Container(
-                child: MarqueeWidget(
-                  child: Text(
-                    song,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: MarqueeWidget(
+                        child: Text(
+                          song.name,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    Container(
+                      padding: const EdgeInsets.only(top: 3),
+                      child: MarqueeWidget(
+                        child: Text(
+                          song.artist,
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.only(top: 3),
-                child: MarqueeWidget(
-                  child: Text(
-                    artist,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
+                padding: EdgeInsets.all(0.2),
+                width: 40.0,
+                child: IconButton(
+                    icon: Icon(Icons.arrow_upward,
+                        color: song.upvoted ? Colors.green : Colors.white),
+                    onPressed: () {
+                      _onUpvoteIconPressed(song);
+                      this.setState(() {});
+                    }),
               ),
+              Container(
+                padding: EdgeInsets.all(0.2),
+                width: 40.0,
+                child: IconButton(
+                    icon: Icon(Icons.arrow_downward,
+                        color: song.downvoted ? Colors.red : Colors.white),
+                    onPressed: () {
+                      _onDownvoteIconPressed(song);
+                      this.setState(() {});
+                    }),
+              ),
+              Container(
+                padding: EdgeInsets.only(right: 20.0),
+                width: 50.0,
+                child: SongOptionsButton(),
+              )
             ],
           ),
+        ));
+  }
+}
+
+void _onUpvoteIconPressed(Song song) {
+  if (song.upvoted) {
+    song.upvoted = false;
+  } else {
+    song.upvote();
+  }
+}
+
+void _onDownvoteIconPressed(Song song) {
+  if (song.downvoted) {
+    song.downvoted = false;
+  } else {
+    song.downvote();
+  }
+}
+
+class SlidableWidget<T> extends StatelessWidget {
+  final Widget child;
+  final Key key;
+  final Song song;
+
+  const SlidableWidget({
+    @required this.child,
+    @required this.key,
+    @required this.song,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Slidable(
+        actionPane: SlidableDrawerActionPane(),
+        child: child,
+        actionExtentRatio: 0.0,
+        key: key,
+        dismissal: SlidableDismissal(
+          dismissThresholds: <SlideActionType, double>{
+            SlideActionType.primary: 0.1,
+            SlideActionType.secondary: 0.1,
+          },
+          child: SlidableDrawerDismissal(),
+          onWillDismiss: (SlideActionType actionType) {
+            if (actionType == SlideActionType.primary) {
+              song.upvote();
+            }
+            if (actionType == SlideActionType.secondary) {
+              song.downvote();
+            }
+            return false;
+          },
         ),
-        SongOptionsButton(),
-      ],
-    ),
-  );
+
+        // Sliding left for upvote:
+        actions: <Widget>[
+          Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [Colors.green[100], Colors.green[300]]),
+              ),
+              child: IconSlideAction(
+                caption: 'Upvote',
+                color: Colors.transparent,
+                icon: Icons.arrow_upward,
+              )),
+        ],
+
+        // Sliding right for downvote:
+        secondaryActions: <Widget>[
+          Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [Colors.red[100], Colors.red[300]]),
+              ),
+              child: IconSlideAction(
+                caption: 'Downvote',
+                color: Colors.transparent,
+                icon: Icons.arrow_downward,
+              )),
+        ]);
+  }
 }
