@@ -400,14 +400,19 @@ class _PlaybackControlsState extends State<PlaybackControls> {
               valueColor: AlwaysStoppedAnimation(Colors.white),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Stack(
+            alignment: AlignmentDirectional.topCenter,
             children: [
-              Text(format(_songProgress)),
-              Text(format(_songDuration - _songProgress)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(format(_songProgress)),
+                  Text(format(_songDuration - _songProgress)),
+                ],
+              ),
+              PlaybackButton(),
             ],
           ),
-          PlaybackButton(),
         ],
       ),
     );
@@ -424,12 +429,16 @@ class _VoteSkipButtonState extends State<VoteSkipButton> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: (_isVoteSkipped
-          ? Icon(Icons.thumb_down, color: Colors.red)
-          : Icon(Icons.thumb_down, color: Colors.white)),
-      tooltip: 'Vote to skip current song',
-      onPressed: _toggleVoteSkip,
+    return Padding(
+      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.01),
+      child: IconButton(
+        iconSize: 30,
+        icon: (_isVoteSkipped
+            ? Icon(Icons.skip_next, color: Colors.red)
+            : Icon(Icons.skip_next, color: Colors.white)),
+        tooltip: 'Vote to skip current song',
+        onPressed: _toggleVoteSkip,
+      ),
     );
   }
 
@@ -449,7 +458,6 @@ class _PlaybackButtonState extends State<PlaybackButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      padding: EdgeInsets.all(0),
       icon: (_isPaused ? Icon(Icons.pause) : Icon(Icons.play_arrow)),
       iconSize: 40,
       onPressed: _togglePlayback,
