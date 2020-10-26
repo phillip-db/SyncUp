@@ -629,7 +629,7 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
                 padding: EdgeInsets.all(0.2),
                 width: 40.0,
                 child: IconButton(
-                    icon: Icon(Icons.arrow_upward,
+                    icon: Icon(Icons.thumb_up,
                         color: song.upvoted ? Colors.green : Colors.white),
                     onPressed: () {
                       _onUpvoteIconPressed(song);
@@ -640,7 +640,7 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
                 padding: EdgeInsets.all(0.2),
                 width: 40.0,
                 child: IconButton(
-                    icon: Icon(Icons.arrow_downward,
+                    icon: Icon(Icons.thumb_down,
                         color: song.downvoted ? Colors.red : Colors.white),
                     onPressed: () {
                       _onDownvoteIconPressed(song);
@@ -721,7 +721,7 @@ class SlidableWidget<T> extends StatelessWidget {
               child: IconSlideAction(
                 caption: 'Upvote',
                 color: Colors.transparent,
-                icon: Icons.arrow_upward,
+                icon: Icons.thumb_up,
               )),
         ],
 
@@ -737,7 +737,7 @@ class SlidableWidget<T> extends StatelessWidget {
               child: IconSlideAction(
                 caption: 'Downvote',
                 color: Colors.transparent,
-                icon: Icons.arrow_downward,
+                icon: Icons.thumb_down,
               )),
         ]);
   }
