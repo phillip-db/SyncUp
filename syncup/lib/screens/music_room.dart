@@ -104,8 +104,8 @@ class _MusicRoomState extends State<MusicRoom> {
           SizedBox(
             height: 18.0,
           ),
-          currentlyPlaying(new Song(
-              'CS 196', 'Sami & Rohan (ft. Course Staff)', 'assets/images/song_placeholder.png')),
+          currentlyPlaying(new Song('CS 196', 'Sami & Rohan (ft. Course Staff)',
+              'assets/images/song_placeholder.png')),
           SizedBox(
             height: 18.0,
           ),
@@ -124,17 +124,13 @@ class _MusicRoomState extends State<MusicRoom> {
           ),
           Container(
               child: Column(
-                children: songs
-                  .map((i) => new SlidableWidget(
-                    child: UpcomingSongList(song: i),
-                    key: Key('i.name ' + i.artist),
-                    song: i
-                  )).toList()
-              )
-          ),
-        ]
-      )
-    );
+                  children: songs
+                      .map((i) => new SlidableWidget(
+                          child: UpcomingSongList(song: i),
+                          key: Key('i.name ' + i.artist),
+                          song: i))
+                      .toList())),
+        ]));
   }
 
   Column buildSongInfo(String songTitle, String songArtist) {
@@ -535,12 +531,12 @@ class Song {
   }
 
   void upvote() {
-    upvoted = true;
+    upvoted = !upvoted;
     downvoted = false;
   }
 
   void downvote() {
-    downvoted = true;
+    downvoted = !downvoted;
     upvoted = false;
   }
 }
