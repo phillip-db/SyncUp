@@ -7,17 +7,73 @@
   <title>Vote</title>
 </head>
 <body>
-  <h1>Join Room: </h1>
+  <h1>Rooms Available:</h1>
   <ul>
     <% for (x in songdata) { %>
-      <li><a href="/vote/<%= x %>"><%= x %></a></li>
+      <li><%= x %></li>
     <% } %>
   </ul>
-  <form action="/vote" method="post">
+
+  <form action="/room/modify" method="get">
+    <h2>Update Room Properties:</h2>
+    <label for="roomname">Roomname: </label>
+    <select onchange="updateSongInfo()" id="selectedRoom" name="roomname">
+      <% for (x in songdata) { %>
+        <option value="<%= x %>"><%= x %></option>
+      <% } %>
+    </select><br>
+    <h3>Song Info:</h3> <!-- use js to dynamically update info from above option -->
+    <div>
+      <ul id="songInfoBox">
+        <li>Please select a room from above to modify the following</li>
+      </ul>
+    </div>
+    <h3>Updates:</h3>
+    <label for="addsong">Add Song: </label>
+    <input type="text" name="addsong">
+    <br>
+    <label for="upvotesong">Upvote Song: </label>
+    <select name="upvotesong" id="upvotesong"></select>
+    <br>
+    <label for="downvotesong">Downvote Song: </label>
+    <select name="downvotesong" id="downvotesong"></select>
+    <br>
+    <label for="removesong">Remove Song: </label>
+    <select name="removesong" id="removesong"></select>
+    <br>
+    <input type="submit" value="Update Song List">
+  </form>
+  <form action="/" method="post">
     <h2>New Room</h2>
     <label for="roomname">Room Name: </label><input name="roomname" type="text">
     <input type="submit" value="Create Room">
   </form>
 
+  <script>
+    let songInfoBox = document.getElementById("songInfoBox");
+
+    function updateSongInfo() {
+      songInfoBox.innerText = "Loading...";
+      fetch("/room/all")
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          songInfoBox.innerText = "";
+          document.getElementById('upvotesong').innerHTML = `<option value=""> </option>`;
+          document.getElementById('downvotesong').innerHTML = `<option value=""> </option>`;
+          document.getElementById('removesong').innerHTML = `<option value=""> </option>`
+          let songInfo = data.rooms[document.getElementById("selectedRoom").value];
+          for (let song in songInfo) {
+            songInfoBox.innerHTML += song + " - " + songInfo[song] + "<br>";
+
+            document.getElementById('upvotesong').innerHTML += `<option value="${song}">${song}</option>`
+            document.getElementById('downvotesong').innerHTML += `<option value="${song}">${song}</option>`
+            document.getElementById('removesong').innerHTML += `<option value="${song}">${song}</option>`
+          }
+           <!-- data.rooms[document.getElementById("selectedRoom").value]; -->
+        });
+        <!-- document.getElementById("selectedSong").value; -->
+    }
+  </script>
 </body>
 </html>
