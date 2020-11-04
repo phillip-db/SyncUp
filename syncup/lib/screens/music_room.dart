@@ -55,7 +55,9 @@ class _MusicRoomState extends State<MusicRoom> {
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: buildSongInfo(songTitle, songArtist),
                   ),
-                  SongOptionsButton(),
+                  SongOptionsButton(
+                    songSource: songSource,
+                  ),
                 ],
               ),
             ),
@@ -108,7 +110,7 @@ class _MusicRoomState extends State<MusicRoom> {
                 height: 18.0,
               ),
               currentlyPlaying(new Song(
-                'CS 196', 'Sami & Rohan (ft. Course Staff)', 'assets/images/song_placeholder.png')),
+                'CS 196', 'Sami & Rohan (ft. Course Staff)', 'assets/images/song_placeholder.png', 'Group 15')),
               SizedBox(
                 height: 18.0,
               ),
@@ -362,11 +364,25 @@ class _MemberListDrawerState extends State<MemberListDrawer> {
 }
 
 class SongOptionsButton extends StatefulWidget {
+  SongOptionsButton({
+    Key key,
+    @required this.songSource,
+  }) : super(key: key);
+
+  final songSource;
+
   @override
-  _SongOptionsButtonState createState() => _SongOptionsButtonState();
+  _SongOptionsButtonState createState() =>
+      _SongOptionsButtonState(songSource: songSource);
 }
 
 class _SongOptionsButtonState extends State<SongOptionsButton> {
+  _SongOptionsButtonState({
+    Key key,
+    @required this.songSource,
+  });
+
+  final songSource;
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
@@ -376,6 +392,17 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
       itemBuilder: (BuildContext context) => [
         PopupMenuItem(
           value: 1,
+          child: Text("DJ: $songSource"),
+        ),
+        PopupMenuItem(
+          value: 2,
+          child: Divider(
+            height: 1,
+            thickness: 2,
+          ),
+        ),
+        PopupMenuItem(
+          value: 3,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -385,7 +412,7 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
           ),
         ),
         PopupMenuItem(
-          value: 2,
+          value: 4,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -395,7 +422,7 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
           ),
         ),
         PopupMenuItem(
-          value: 3,
+          value: 5,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -557,13 +584,15 @@ class Song {
   String name;
   String artist;
   String imagePath;
+  String dj;
   bool upvoted = false;
   bool downvoted = false;
 
-  Song(String name, String artist, String imagePath) {
+  Song(String name, String artist, String imagePath, String dj) {
     this.name = name;
     this.artist = artist;
     this.imagePath = imagePath;
+    this.dj = dj;
   }
 
   void upvote() {
@@ -580,14 +609,18 @@ class Song {
 void setSongs() {
   // For Testing:
   for (int i = 1; i <= 20; i++) {
-    Song newSong = new Song('This is Example Song ' + i.toString(),
-        'artist ' + i.toString(), 'assets/images/song_placeholder.png');
+    Song newSong = new Song(
+        'This is Example Song ' + i.toString(),
+        'artist ' + i.toString(),
+        'assets/images/song_placeholder.png',
+        'Group 15');
     songs.add(newSong);
   }
   Song longSong = new Song(
       'Example long long long long long long title',
       'Example long long long long long long long long long long artist',
-      'assets/images/song_placeholder.png');
+      'assets/images/song_placeholder.png',
+      'long long long long long long long DJ');
   songs.add(longSong);
 }
 
@@ -682,7 +715,9 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
               Container(
                 padding: EdgeInsets.only(right: 20.0),
                 width: 50.0,
-                child: SongOptionsButton(),
+                child: SongOptionsButton(
+                  songSource: song.dj,
+                ),
               )
             ],
           ),
