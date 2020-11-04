@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../marquee.dart';
 import '../members.dart';
+import 'add_song_screen.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -29,11 +30,21 @@ class _MusicRoomState extends State<MusicRoom> {
     setSongs();
 
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: buildAppBar(),
-      endDrawer: MemberListDrawer(),
-      body: mainBody(context, songTitle, songArtist, bgColor),
-    );
+        backgroundColor: Theme.of(context).backgroundColor,
+        appBar: buildAppBar(),
+        endDrawer: MemberListDrawer(),
+        body: mainBody(context, songTitle, songArtist, bgColor),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pushNamed(context, SongScreen.route);
+          },
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+          backgroundColor: Colors.orange,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat);
   }
 
   Container mainContainer(String songTitle, String songArtist, Color bgColor) {
@@ -576,24 +587,33 @@ class Song {
     downvoted = !downvoted;
     upvoted = false;
   }
+
+  void addSong() {
+    songs.add(this);
+  }
 }
 
 void setSongs() {
   // For Testing:
-  for (int i = 1; i <= 20; i++) {
-    Song newSong = new Song(
-        'This is Example Song ' + i.toString(),
-        'artist ' + i.toString(),
+  int numSongs = 20;
+
+  // Prevent the list from growing on quick refresh and reentering the room.
+  if (songs.length < numSongs) {
+    for (int i = 1; i <= numSongs; i++) {
+      Song newSong = new Song(
+          'This is Example Song ' + i.toString(),
+          'artist ' + i.toString(),
+          'assets/images/song_placeholder.png',
+          'Group 15');
+      songs.add(newSong);
+    }
+    Song longSong = new Song(
+        'Example long long long long long long title',
+        'Example long long long long long long long long long long artist',
         'assets/images/song_placeholder.png',
-        'Group 15');
-    songs.add(newSong);
+        'long long long long long long long DJ');
+    songs.add(longSong);
   }
-  Song longSong = new Song(
-      'Example long long long long long long title',
-      'Example long long long long long long long long long long artist',
-      'assets/images/song_placeholder.png',
-      'long long long long long long long DJ');
-  songs.add(longSong);
 }
 
 class UpcomingSongList extends StatefulWidget {
