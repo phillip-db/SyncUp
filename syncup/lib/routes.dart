@@ -8,6 +8,6 @@ getRoutes() {
     MainScreen.route: (context) => MainScreen(),
     LoginScreen.route: (context) => LoginScreen(),
     MusicRoom.route: (context) => MusicRoom(),
-    SongScreen.route: (context) => SongScreen(),
+    SongScreen.route: (context) => SongScreen(songs),
   };
 }

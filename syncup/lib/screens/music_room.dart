@@ -35,16 +35,21 @@ class _MusicRoomState extends State<MusicRoom> {
         endDrawer: MemberListDrawer(),
         body: mainBody(context, songTitle, songArtist, bgColor),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushNamed(context, SongScreen.route);
-          },
-          child: Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-          backgroundColor: Colors.orange,
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat);
+            onPressed: () {
+              Navigator.pushNamed(context, SongScreen.route);
+            },
+            child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Colors.deepOrange, Colors.orange[100]]),
+                ),
+                child: Icon(Icons.add, color: Colors.grey[600]))),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat);
   }
 
   Container mainContainer(String songTitle, String songArtist, Color bgColor) {
@@ -590,6 +595,10 @@ class Song {
 
   void addSong() {
     songs.add(this);
+  }
+
+  void removeSong() {
+    songs.remove(this);
   }
 }
 
