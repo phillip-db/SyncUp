@@ -7,6 +7,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 double maxWidthPct = 0.75;
 List<Song> songs = [];
+bool slidingPanelOpen = false;
 
 class MusicRoom extends StatefulWidget {
   static String route = 'music';
@@ -18,7 +19,6 @@ class MusicRoom extends StatefulWidget {
 class _MusicRoomState extends State<MusicRoom> {
   String _roomOwner = 'Group 15(Best Group)';
   String songSource = 'Group 15';
-  int _currentIndex = 1;
   double songDuration = 220;
 
   @override
@@ -29,27 +29,27 @@ class _MusicRoomState extends State<MusicRoom> {
 
     setSongs();
 
+    Offset _pointerDownPosition;
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: buildAppBar(),
         endDrawer: MemberListDrawer(),
-        body: mainBody(context, songTitle, songArtist, bgColor),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
+        body: Listener(
+          child: mainBody(context, songTitle, songArtist, bgColor),
+          onPointerDown: (details) {
+            if (slidingPanelOpen) {
+              _pointerDownPosition = Offset.infinite;
+            } else {
+              _pointerDownPosition = details.position;
+            }
+          },
+          onPointerUp: (details) {
+            if (details.position.dy - _pointerDownPosition.dy > 100.0) {
               Navigator.pushNamed(context, SongScreen.route);
-            },
-            child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Colors.deepOrange, Colors.orange[100]]),
-                ),
-                child: Icon(Icons.add, color: Colors.grey[600]))),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat);
+            }
+          },
+        )
+    );
   }
 
   Container mainContainer(String songTitle, String songArtist, Color bgColor) {
@@ -89,6 +89,12 @@ class _MusicRoomState extends State<MusicRoom> {
   SlidingUpPanel mainBody(BuildContext context, String songTitle,
       String songArtist, Color bgColor) {
     return SlidingUpPanel(
+        onPanelOpened: () {
+          slidingPanelOpen = true;
+        },
+        onPanelClosed: () {
+          slidingPanelOpen = false;
+        },
         color: Colors.grey[850],
         minHeight: 60,
         maxHeight: MediaQuery.of(context).size.height * 0.85,
@@ -105,50 +111,91 @@ class _MusicRoomState extends State<MusicRoom> {
     return MediaQuery.removePadding(
         context: context,
         removeTop: true,
-        child: ListView(controller: sc, children: <Widget>[
-          SizedBox(height: 30.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                width: 30,
-                height: 5,
-                decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.all(Radius.circular(12.0))),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 18.0,
-          ),
-          currentlyPlaying(new Song('CS 196', 'Sami & Rohan (ft. Course Staff)',
-              'assets/images/song_placeholder.png', 'Group 15')),
-          SizedBox(
-            height: 18.0,
-          ),
-          Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                'Up Next',
-                style: TextStyle(
-                  color: Colors.cyan,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+        child: Stack(
+          children: [
+            ListView(
+              controller: sc, 
+              children: <Widget>[
+                SizedBox(height: 30.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: 30,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.all(Radius.circular(12.0))),
+                    ),
+                  ],
                 ),
-              )),
-          SizedBox(
-            height: 5.0,
-          ),
-          Container(
-              child: Column(
-                  children: songs
-                      .map((i) => new SlidableWidget(
-                          child: UpcomingSongList(song: i),
-                          key: Key('i.name ' + i.artist),
-                          song: i))
-                      .toList())),
-        ]));
+                SizedBox(
+                  height: 18.0,
+                ),
+                currentlyPlaying(new Song(
+                  'CS 196',
+                  'Sami & Rohan (ft. Course Staff)',
+                  'assets/images/song_placeholder.png',
+                  'Group 15')),
+                SizedBox(
+                  height: 18.0,
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Text(
+                    'Up Next',
+                    style: TextStyle(
+                      color: Colors.cyan,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ),
+                SizedBox(
+                  height: 5.0,
+                ),
+                Container(
+                  child: Column(
+                    children: songs
+                        .map((i) => new SlidableWidget(
+                            child: UpcomingSongList(song: i),
+                            key: Key('i.name ' + i.artist),
+                            song: i)).toList()
+                  )
+                ),
+              ]
+            ),
+            Positioned(
+              right: 2,
+              bottom: 60,
+              width: 100,
+              height: 100,
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.deepOrange,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.deepOrange, Colors.orange[100]]
+                      )
+                    ),
+                    child: Icon(Icons.add, color: Colors.grey[600]),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, SongScreen.route);
+                  },
+                ),
+              ),
+            ),
+          ]
+        )
+    );
   }
 
   Column buildSongInfo(String songTitle, String songArtist) {
