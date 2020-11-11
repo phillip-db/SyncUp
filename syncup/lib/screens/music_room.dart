@@ -4,8 +4,14 @@ import '../members.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-double maxWidthPct = 0.75;
+/// Constant value specifying a max width as a percentage of screen width
+final double maxWidthPct = 0.75;
+
+/// List of songs to be played
 List<Song> songs = [];
+
+/// (Debug) Counter to prevent songs from being added on quick reloads
+int count = 0;
 
 class MusicRoom extends StatefulWidget {
   static String route = 'music';
@@ -17,7 +23,6 @@ class MusicRoom extends StatefulWidget {
 class _MusicRoomState extends State<MusicRoom> {
   String _roomOwner = 'Group 15(Best Group)';
   String songSource = 'Group 15';
-  int _currentIndex = 1;
   double songDuration = 220;
 
   @override
@@ -26,7 +31,10 @@ class _MusicRoomState extends State<MusicRoom> {
     String songArtist = 'Sami & Rohan (ft. Course Staff)';
     Color bgColor = Colors.black45;
 
-    setSongs();
+    if (count == 0) {
+      setSongs();
+      count++;
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -36,6 +44,7 @@ class _MusicRoomState extends State<MusicRoom> {
     );
   }
 
+  /// Container including everything besides the app bar and song list
   Container mainContainer(String songTitle, String songArtist, Color bgColor) {
     return Container(
         color: bgColor,
@@ -70,6 +79,7 @@ class _MusicRoomState extends State<MusicRoom> {
         ));
   }
 
+  /// Main body of the music room
   SlidingUpPanel mainBody(BuildContext context, String songTitle,
       String songArtist, Color bgColor) {
     return SlidingUpPanel(
@@ -85,33 +95,34 @@ class _MusicRoomState extends State<MusicRoom> {
         body: mainContainer(songTitle, songArtist, bgColor));
   }
 
+  /// Builds sliding panel containing the song list
   Widget buildSlidingPanel(ScrollController sc) {
     return MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: ListView(controller: sc, children: <Widget>[
-          SizedBox(height: 30.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+      context: context,
+      removeTop: true,
+      child: ListView(controller: sc, children: <Widget>[
+        SizedBox(height: 30.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
             Container(
               width: 30,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.all(Radius.circular(12.0))),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 18.0,
-          ),
-          currentlyPlaying(new Song(
-            'CS 196', 'Sami & Rohan (ft. Course Staff)', 'assets/images/song_placeholder.png', 'Group 15')),
-          SizedBox(
-            height: 18.0,
-          ),
-          Container(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.all(Radius.circular(12.0))),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 18.0,
+        ),
+        currentlyPlaying(new Song('CS 196', 'Sami & Rohan (ft. Course Staff)',
+            'assets/images/song_placeholder.png', 'Group 15')),
+        SizedBox(
+          height: 18.0,
+        ),
+        Container(
             padding: EdgeInsets.only(left: 10),
             child: Text(
               'Up Next',
@@ -120,24 +131,23 @@ class _MusicRoomState extends State<MusicRoom> {
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
-            )
-          ),
-          SizedBox(
-            height: 5.0,
-          ),
-          Container(
+            )),
+        SizedBox(
+          height: 5.0,
+        ),
+        Container(
             child: Column(
-              children: songs
-              .map((i) => new SlidableWidget(
-                child: UpcomingSongList(song: i),
-                key: Key('i.name ' + i.artist),
-                song: i)).toList()
-            )
-          ),
-        ]),
+                children: songs
+                    .map((i) => new SlidableWidget(
+                        child: UpcomingSongList(song: i),
+                        key: Key('i.name ' + i.artist),
+                        song: i))
+                    .toList())),
+      ]),
     );
   }
 
+  /// Builds a song's title and artist below the image
   Column buildSongInfo(String songTitle, String songArtist) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -162,6 +172,7 @@ class _MusicRoomState extends State<MusicRoom> {
     );
   }
 
+  /// Builds app bar containing room owner and member list.
   AppBar buildAppBar() {
     return AppBar(
       centerTitle: true,
@@ -180,6 +191,7 @@ class _MusicRoomState extends State<MusicRoom> {
   }
 }
 
+/// Sets the text above the song image to the source/DJ of the current song.
 class SongSource extends StatefulWidget {
   SongSource({
     Key key,
@@ -216,6 +228,7 @@ class _SongSourceState extends State<SongSource> {
   }
 }
 
+/// Builds the widget containing the image for the currently playing song.
 class SongImage extends StatefulWidget {
   SongImage({Key key}) : super(key: key);
 
@@ -246,6 +259,7 @@ class _SongImageState extends State<SongImage> {
   }
 }
 
+/// Drawer that opens on the right side of the screen displaying room members
 class MemberListDrawer extends StatefulWidget {
   MemberListDrawer({
     Key key,
@@ -330,6 +344,7 @@ class _MemberListDrawerState extends State<MemberListDrawer> {
   }
 }
 
+/// Button for each song displaying various options
 class SongOptionsButton extends StatefulWidget {
   SongOptionsButton({
     Key key,
@@ -368,6 +383,8 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
             thickness: 2,
           ),
         ),
+
+        /// Open Spotify and display the linked song
         PopupMenuItem(
           value: 3,
           child: Row(
@@ -378,31 +395,12 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
             ],
           ),
         ),
-        PopupMenuItem(
-          value: 4,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Upvote'),
-              Icon(Icons.keyboard_arrow_up),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 5,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Downvote'),
-              Icon(Icons.keyboard_arrow_down),
-            ],
-          ),
-        ),
       ],
     );
   }
 }
 
+/// Playback controls for current song, includes song progress bar
 class PlaybackControls extends StatefulWidget {
   _PlaybackControlsState createState() => _PlaybackControlsState();
 }
@@ -444,6 +442,7 @@ class _PlaybackControlsState extends State<PlaybackControls> {
   }
 }
 
+/// Button to toggle vote skip indication
 class VoteSkipButton extends StatefulWidget {
   @override
   _VoteSkipButtonState createState() => _VoteSkipButtonState();
@@ -468,6 +467,7 @@ class _VoteSkipButtonState extends State<VoteSkipButton> {
   }
 }
 
+/// Pauses or resumes playback of songs for this user only
 class PlaybackButton extends StatefulWidget {
   @override
   _PlaybackButtonState createState() => _PlaybackButtonState();
@@ -491,6 +491,7 @@ class _PlaybackButtonState extends State<PlaybackButton> {
   }
 }
 
+/// Displays song title and artist for currently playing song
 Widget currentlyPlaying(Song song) {
   return Container(
     child: Row(
@@ -547,6 +548,7 @@ Widget currentlyPlaying(Song song) {
   );
 }
 
+/// Stores information about a given song (name, artist, etc.).
 class Song {
   String name;
   String artist;
@@ -573,6 +575,7 @@ class Song {
   }
 }
 
+/// Initialize list of songs for testing
 void setSongs() {
   // For Testing:
   for (int i = 1; i <= 20; i++) {
@@ -591,6 +594,7 @@ void setSongs() {
   songs.add(longSong);
 }
 
+/// Displays scrolling list of upcoming songs
 class UpcomingSongList extends StatefulWidget {
   final Song song;
 
@@ -692,6 +696,7 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
   }
 }
 
+/// Toggle upvote status of song
 void _onUpvoteIconPressed(Song song) {
   if (song.upvoted) {
     song.upvoted = false;
@@ -700,6 +705,7 @@ void _onUpvoteIconPressed(Song song) {
   }
 }
 
+/// Toggle downvote status of song
 void _onDownvoteIconPressed(Song song) {
   if (song.downvoted) {
     song.downvoted = false;
@@ -708,6 +714,7 @@ void _onDownvoteIconPressed(Song song) {
   }
 }
 
+/// Allows the  ListTile to slide left or right and upvote/downvote a song
 class SlidableWidget<T> extends StatelessWidget {
   final Widget child;
   final Key key;

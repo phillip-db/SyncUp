@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-//Credit to leodriesch on stackoverflow
 
+/// Creates a widget which scrolls overflowing text.
+///
+/// Credit to leodriesch on stackoverflow.
 class MarqueeWidget extends StatefulWidget {
   final Widget child;
   final Axis direction;
