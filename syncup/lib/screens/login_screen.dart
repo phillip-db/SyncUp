@@ -18,75 +18,115 @@ class LoginScreen extends StatelessWidget {
         color: Colors.grey[800],
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 80),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image(
-                    width: MediaQuery.of(context).size.width * 0.2,
-                    image: AssetImage('assets/images/song_placeholder.png'),
-                  ),
-                  Text(
-                    'SyncUp',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                    ),
-                    textScaleFactor: 4.5,
-                  ),
-                ],
-              ),
-            ),
+            LogoText(),
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.1,
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: GestureDetector(
-                onTap: () async {
-                  const url = 'https://www.spotify.com';
-                  if (await canLaunch(url)) {
-                    await launch(url);
-                    Navigator.pushNamed(context, MainScreen.route);
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  child: Image(
-                    image: AssetImage('assets/images/spotify_logo.png'),
-                  ),
-                ),
-              ),
-            ),
-            Text(
-              'Log in with Spotify',
-              style: TextStyle(fontSize: 18),
-            ),
+            LoginButton(),
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.13,
             ),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: new InkWell(
-                child: new Text(
-                  'By logging in, you agree to the SyncUp Terms of Service',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12),
-                ),
-                onTap: () async {
-                  const url = 'http://cs196.cs.illinois.edu/';
-                  if (await canLaunch(url)) {
-                    await launch(url);
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
-              ),
-            ),
+            TermsOfService(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Text containing Terms of Service
+class TermsOfService extends StatelessWidget {
+  const TermsOfService({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.5,
+      child: new InkWell(
+        child: new Text(
+          'By logging in, you agree to the SyncUp Terms of Service',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12),
+        ),
+        onTap: () async {
+          const url = 'http://cs196.cs.illinois.edu/';
+          if (await canLaunch(url)) {
+            await launch(url);
+          } else {
+            throw 'Could not launch $url';
+          }
+        },
+      ),
+    );
+  }
+}
+
+/// Button that prompts user to login with their Spotify account
+class LoginButton extends StatelessWidget {
+  const LoginButton({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: GestureDetector(
+            onTap: () async {
+              const url = 'https://www.spotify.com';
+              if (await canLaunch(url)) {
+                await launch(url);
+                Navigator.pushNamed(context, MainScreen.route);
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.4,
+              child: Image(
+                image: AssetImage('assets/images/spotify_logo.png'),
+              ),
+            ),
+          ),
+        ),
+        Text(
+          'Log in with Spotify',
+          style: TextStyle(fontSize: 18),
+        ),
+      ],
+    );
+  }
+}
+
+/// Container that includes SyncUp logo and text
+class LogoText extends StatelessWidget {
+  const LogoText({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 80),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image(
+            width: MediaQuery.of(context).size.width * 0.2,
+            image: AssetImage('assets/images/song_placeholder.png'),
+          ),
+          Text(
+            'SyncUp',
+            style: TextStyle(
+              fontWeight: FontWeight.w400,
+            ),
+            textScaleFactor: 4.5,
+          ),
+        ],
       ),
     );
   }

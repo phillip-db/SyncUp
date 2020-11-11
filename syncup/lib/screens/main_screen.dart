@@ -12,6 +12,7 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
 
+  /// Animation of rotating colors for background
   Animatable<Color> background = TweenSequence<Color>(
     [
       TweenSequenceItem(
@@ -101,6 +102,7 @@ class _MainScreenState extends State<MainScreen>
   }
 }
 
+/// Button to join a room
 class JoinRoomButton extends StatefulWidget {
   final double _buttonDimension;
   final RoundedRectangleBorder _rectangleBorder;
@@ -142,6 +144,7 @@ class _JoinRoomButtonState extends State<JoinRoomButton> {
     );
   }
 
+  /// Brings up prompt for room code
   Future _promptRoomCode(BuildContext context) {
     return showDialog(
       context: context,
@@ -179,6 +182,7 @@ class _JoinRoomButtonState extends State<JoinRoomButton> {
     );
   }
 
+  /// Alerts user upon inputting an invalid code
   Future _alertInvalidCode(BuildContext context) {
     return showDialog(
       context: context,
@@ -201,6 +205,7 @@ class _JoinRoomButtonState extends State<JoinRoomButton> {
   }
 }
 
+/// Button to create a new room
 class CreateRoomButton extends StatelessWidget {
   const CreateRoomButton({
     Key key,
@@ -233,6 +238,7 @@ class CreateRoomButton extends StatelessWidget {
   }
 }
 
+/// Centered text for main screen buttons
 class ButtonText extends StatelessWidget {
   const ButtonText({
     Key key,
