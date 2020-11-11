@@ -24,11 +24,11 @@ class _MusicRoomState extends State<MusicRoom> {
   String _roomOwner = 'Group 15(Best Group)';
   String songSource = 'Group 15';
   double songDuration = 220;
+  Song nowPlaying = Song('CS 196', 'Sami & Rohan (ft. Course Staff)',
+      'assets/images/song_placeholder.png', 'Group 15');
 
   @override
   Widget build(BuildContext context) {
-    String songTitle = 'CS 196';
-    String songArtist = 'Sami & Rohan (ft. Course Staff)';
     Color bgColor = Colors.black45;
 
     if (count == 0) {
@@ -40,7 +40,7 @@ class _MusicRoomState extends State<MusicRoom> {
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: buildAppBar(),
       endDrawer: MemberListDrawer(),
-      body: mainBody(context, songTitle, songArtist, bgColor),
+      body: mainBody(context, nowPlaying.name, nowPlaying.artist, bgColor),
     );
   }
 
@@ -354,17 +354,10 @@ class SongOptionsButton extends StatefulWidget {
   final songSource;
 
   @override
-  _SongOptionsButtonState createState() =>
-      _SongOptionsButtonState(songSource: songSource);
+  _SongOptionsButtonState createState() => _SongOptionsButtonState();
 }
 
 class _SongOptionsButtonState extends State<SongOptionsButton> {
-  _SongOptionsButtonState({
-    Key key,
-    @required this.songSource,
-  });
-
-  final songSource;
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
@@ -374,7 +367,7 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
       itemBuilder: (BuildContext context) => [
         PopupMenuItem(
           value: 1,
-          child: Text("DJ: $songSource"),
+          child: Text("DJ: ${widget.songSource}"),
         ),
         PopupMenuItem(
           value: 2,
@@ -453,12 +446,16 @@ class _VoteSkipButtonState extends State<VoteSkipButton> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: (_isVoteSkipped
-          ? Icon(Icons.thumb_down, color: Colors.red)
-          : Icon(Icons.thumb_down, color: Colors.white)),
-      tooltip: 'Vote to skip current song',
-      onPressed: _toggleVoteSkip,
+    return Padding(
+      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * .01),
+      child: IconButton(
+        icon: (_isVoteSkipped
+            ? Icon(Icons.skip_next, color: Colors.red)
+            : Icon(Icons.skip_next, color: Colors.white)),
+        tooltip: 'Vote to skip current song',
+        onPressed: _toggleVoteSkip,
+        iconSize: 30,
+      ),
     );
   }
 
@@ -556,6 +553,7 @@ class Song {
   String dj;
   bool upvoted = false;
   bool downvoted = false;
+  bool voted = false;
 
   Song(String name, String artist, String imagePath, String dj) {
     this.name = name;
@@ -565,13 +563,23 @@ class Song {
   }
 
   void upvote() {
-    upvoted = true;
+    upvoted = !upvoted;
     downvoted = false;
+    if (upvoted == false) {
+      voted = false;
+    } else {
+      voted = true;
+    }
   }
 
   void downvote() {
-    downvoted = true;
+    downvoted = !downvoted;
     upvoted = false;
+    if (downvoted == false) {
+      voted = false;
+    } else {
+      voted = true;
+    }
   }
 }
 
@@ -661,27 +669,27 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
                   ],
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(0.2),
-                width: 40.0,
-                child: IconButton(
-                    icon: Icon(Icons.thumb_up,
+              Stack(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(0.2),
+                    width: 40.0,
+                    child: Icon(song.upvoted ? Icons.thumb_up : null,
                         color: song.upvoted ? Colors.green : Colors.white),
-                    onPressed: () {
-                      _onUpvoteIconPressed(song);
-                      this.setState(() {});
-                    }),
-              ),
-              Container(
-                padding: EdgeInsets.all(0.2),
-                width: 40.0,
-                child: IconButton(
-                    icon: Icon(Icons.thumb_down,
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(0.2),
+                    width: 40.0,
+                    child: Icon(song.downvoted ? Icons.thumb_down : null,
                         color: song.downvoted ? Colors.red : Colors.white),
-                    onPressed: () {
-                      _onDownvoteIconPressed(song);
-                      this.setState(() {});
-                    }),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(0.2),
+                    width: 40.0,
+                    child: Icon(song.voted ? null : Icons.thumbs_up_down,
+                        color: Colors.white),
+                  ),
+                ],
               ),
               Container(
                 padding: EdgeInsets.only(right: 20.0),
@@ -699,7 +707,7 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
 /// Toggle upvote status of song
 void _onUpvoteIconPressed(Song song) {
   if (song.upvoted) {
-    song.upvoted = false;
+    song.upvoted = !song.upvoted;
   } else {
     song.upvote();
   }
@@ -708,7 +716,7 @@ void _onUpvoteIconPressed(Song song) {
 /// Toggle downvote status of song
 void _onDownvoteIconPressed(Song song) {
   if (song.downvoted) {
-    song.downvoted = false;
+    song.downvoted = !song.downvoted;
   } else {
     song.downvote();
   }
