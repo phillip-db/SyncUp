@@ -104,7 +104,7 @@ class _MusicRoomState extends State<MusicRoom> {
         SizedBox(height: 30.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          children: [
             Container(
               width: 30,
               height: 5,
@@ -421,14 +421,22 @@ class _PlaybackControlsState extends State<PlaybackControls> {
               valueColor: AlwaysStoppedAnimation(Colors.white),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Stack(
+            alignment: AlignmentDirectional.topCenter,
             children: [
-              Text(format(_songProgress)),
-              Text(format(_songDuration - _songProgress)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(format(_songProgress)),
+                  Text(format(_songDuration - _songProgress)),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 7),
+                child: PlaybackButton(),
+              ),
             ],
           ),
-          PlaybackButton(),
         ],
       ),
     );
