@@ -16,7 +16,6 @@ class SongScreen extends StatelessWidget {
   final List<Song> songs;
   SongScreen(this.songs);
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,13 +23,12 @@ class SongScreen extends StatelessWidget {
           centerTitle: true,
           title: Text('Add Song'),
         ),
-        body: searchWidget()
-    );
+        body: searchWidget());
   }
 }
 
 Builder searchWidget() {
-    Future<List<SearchSong>> search(String search) async {
+  Future<List<SearchSong>> search(String search) async {
     await Future.delayed(Duration(seconds: 2));
     return List.generate(10, (int index) {
       return SearchSong(
@@ -47,6 +45,7 @@ Builder searchWidget() {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: SearchBar<SearchSong>(
+          minimumChars: 1,
           textStyle: TextStyle(color: Colors.white),
           icon: Icon(Icons.search, color: Colors.white),
           loader: Center(
