@@ -140,16 +140,43 @@ class _MusicRoomState extends State<MusicRoom> {
                 SizedBox(
                   height: 18.0,
                 ),
-                Container(
-                  padding: EdgeInsets.only(left: 10),
-                  child: Text(
-                    'Up Next',
-                    style: TextStyle(
-                      color: Colors.cyan,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Text(
+                        'Up Next',
+                        style: TextStyle(
+                          color: Colors.cyan,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
                     ),
-                  )
+                    Container(
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.only(left: 220, right: 10),
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.deepOrange,
+                        child: Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Colors.deepOrange, Colors.orange[100]]
+                            )
+                          ),
+                          child: Icon(Icons.add, color: Colors.grey[850]),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, SongScreen.route);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(
                   height: 5.0,
@@ -164,34 +191,6 @@ class _MusicRoomState extends State<MusicRoom> {
                   )
                 ),
               ]
-            ),
-            Positioned(
-              right: 2,
-              bottom: 60,
-              width: 100,
-              height: 100,
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: FloatingActionButton(
-                  backgroundColor: Colors.deepOrange,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Colors.deepOrange, Colors.orange[100]]
-                      )
-                    ),
-                    child: Icon(Icons.add, color: Colors.grey[600]),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, SongScreen.route);
-                  },
-                ),
-              ),
             ),
           ]
         )
