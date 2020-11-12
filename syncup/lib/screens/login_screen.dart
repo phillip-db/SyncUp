@@ -116,8 +116,12 @@ class LogoText extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image(
-            width: MediaQuery.of(context).size.width * 0.2,
-            image: AssetImage('assets/images/song_placeholder.png'),
+            width: MediaQuery.of(context).size.width * 0.15,
+            height: MediaQuery.of(context).size.height * 0.2,
+            image: AssetImage('assets/images/syncup_logo.png'),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(6.0),
           ),
           Text(
             'SyncUp',
