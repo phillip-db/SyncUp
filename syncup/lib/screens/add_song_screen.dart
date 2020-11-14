@@ -67,14 +67,21 @@ Builder searchWidget() {
                 if (!songAlreadyAdded(newSong)) {
                   newSong.addSong();
                   Scaffold.of(context).showSnackBar(SnackBar(
-                      backgroundColor: Colors.greenAccent[400],
-                      content: Text(newSong.name + " Added to Queue"),
-                      duration: Duration(seconds: 3),
-                      action: SnackBarAction(
-                          label: 'Undo',
-                          onPressed: () {
-                            newSong.removeSong();
-                          })));
+                    backgroundColor: Colors.greenAccent[400],
+                    content: Text(newSong.name + " Added to Queue"),
+                    duration: Duration(seconds: 3),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {
+                        Scaffold.of(context).hideCurrentSnackBar();
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          backgroundColor: Colors.red[200],
+                          content: Text(newSong.name + " Removed")
+                        ));
+                        newSong.removeSong();
+                      }
+                    )
+                  ));
                 } else {
                   Scaffold.of(context).showSnackBar(SnackBar(
                       backgroundColor: Colors.green[100],

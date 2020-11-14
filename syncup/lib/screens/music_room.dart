@@ -111,89 +111,85 @@ class _MusicRoomState extends State<MusicRoom> {
     return MediaQuery.removePadding(
         context: context,
         removeTop: true,
-        child: Stack(
-          children: [
-            ListView(
-              controller: sc, 
+        child: Stack(children: [
+          ListView(controller: sc, children: <Widget>[
+            SizedBox(height: 30.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SizedBox(height: 30.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      width: 30,
-                      height: 5,
+                Container(
+                  width: 30,
+                  height: 5,
+                  decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.all(Radius.circular(12.0))),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 18.0,
+            ),
+            currentlyPlaying(new Song(
+                'CS 196',
+                'Sami & Rohan (ft. Course Staff)',
+                'assets/images/song_placeholder.png',
+                'Group 15')),
+            SizedBox(
+              height: 18.0,
+            ),
+            Row(
+              children: [
+                Container(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      'Up Next',
+                      style: TextStyle(
+                        color: Colors.cyan,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                ),
+                Container(
+                  alignment: Alignment.centerRight,
+                  padding: EdgeInsets.only(left: 220, right: 10),
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.deepOrange,
+                    child: Container(
+                      width: 100,
+                      height: 100,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.all(Radius.circular(12.0))),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 18.0,
-                ),
-                currentlyPlaying(new Song(
-                  'CS 196',
-                  'Sami & Rohan (ft. Course Staff)',
-                  'assets/images/song_placeholder.png',
-                  'Group 15')),
-                SizedBox(
-                  height: 18.0,
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Up Next',
-                        style: TextStyle(
-                          color: Colors.cyan,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    ),
-                    Container(
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.only(left: 220, right: 10),
-                      child: FloatingActionButton(
-                        backgroundColor: Colors.deepOrange,
-                        child: Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [Colors.deepOrange, Colors.orange[100]]
-                            )
-                          ),
-                          child: Icon(Icons.add, color: Colors.grey[850]),
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, SongScreen.route);
-                        },
+                          )
                       ),
+                      child: Icon(Icons.add, color: Colors.grey[850]),
                     ),
-                  ],
+                    onPressed: () {
+                      Navigator.pushNamed(context, SongScreen.route);
+                    },
+                  ),
                 ),
-                SizedBox(
-                  height: 5.0,
-                ),
-                Container(
-                  child: Column(
-                    children: songs
-                        .map((i) => new SlidableWidget(
-                            child: UpcomingSongList(song: i),
-                            key: Key('i.name ' + i.artist),
-                            song: i)).toList()
-                  )
-                ),
-              ]
+              ],
             ),
-          ]
-        )
+            SizedBox(
+              height: 5.0,
+            ),
+            Container(
+              child: Column(
+                children: songs.map((i) => new SlidableWidget(
+                  child: UpcomingSongList(song: i),
+                  key: Key('i.name ' + i.artist),
+                  song: i)
+                ).toList()
+              )
+            ),
+          ]),
+        ]
+      )
     );
   }
 
