@@ -10,6 +10,7 @@ List<Song> songs = [];
 bool slidingPanelOpen = false;
 // Enables admin features when true
 bool admin = true;
+bool firstTimeLoading = true;
 
 class MusicRoom extends StatefulWidget {
   static String route = 'music';
@@ -28,35 +29,36 @@ class _MusicRoomState extends State<MusicRoom> {
 
   @override
   Widget build(BuildContext context) {
-    Song exampleSong = new Song('CS 196', 'Sami & Rohan (ft. Course Staff)',
-        'assets/images/song_placeholder.png', 'group 15');
-    songs.add(exampleSong);
-    setSongs();
+    if (firstTimeLoading) {
+      Song exampleSong = new Song('CS 196', 'Sami & Rohan (ft. Course Staff)',
+          'assets/images/song_placeholder.png', 'group 15');
+      songs.add(exampleSong);
+      setSongs();
+    }
 
     Color bgColor = Colors.black45;
 
     Offset _pointerDownPosition;
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: buildAppBar(),
-      endDrawer: MemberListDrawer(),
-      // Detects swipe down to go to add song screen
-      body: Listener(
-        child: swipeUpPanel(context, bgColor, refresh),
-        onPointerDown: (details) {
-          if (slidingPanelOpen) {
-            _pointerDownPosition = Offset.infinite;
-          } else {
-            _pointerDownPosition = details.position;
-          }
-        },
-        onPointerUp: (details) {
-          if (details.position.dy - _pointerDownPosition.dy > 100.0) {
-            Navigator.pushNamed(context, SongScreen.route);
-          }
-        },
-      )
-    );
+        backgroundColor: Theme.of(context).backgroundColor,
+        appBar: buildAppBar(),
+        endDrawer: MemberListDrawer(),
+        // Detects swipe down to go to add song screen
+        body: Listener(
+          child: swipeUpPanel(context, bgColor, refresh),
+          onPointerDown: (details) {
+            if (slidingPanelOpen) {
+              _pointerDownPosition = Offset.infinite;
+            } else {
+              _pointerDownPosition = details.position;
+            }
+          },
+          onPointerUp: (details) {
+            if (details.position.dy - _pointerDownPosition.dy > 100.0) {
+              Navigator.pushNamed(context, SongScreen.route);
+            }
+          },
+        ));
   }
 
   SlidingUpPanel swipeUpPanel(
@@ -66,75 +68,73 @@ class _MusicRoomState extends State<MusicRoom> {
     }
 
     return SlidingUpPanel(
-      onPanelOpened: () {
-        slidingPanelOpen = true;
-      },
-      onPanelClosed: () {
-        slidingPanelOpen = false;
-      },
-      color: Colors.grey[850],
-      minHeight: 60,
-      maxHeight: MediaQuery.of(context).size.height * 0.85,
-      backdropOpacity: 1.0,
-      parallaxEnabled: true,
-      parallaxOffset: .5,
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0)
-      ),
-      panelBuilder: (scrollController) => buildSlidingPanel(scrollController),
-      body: currentSongDisplay(bgColor, refresh)
-    );
+        onPanelOpened: () {
+          slidingPanelOpen = true;
+        },
+        onPanelClosed: () {
+          slidingPanelOpen = false;
+        },
+        color: Colors.grey[850],
+        minHeight: 60,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
+        backdropOpacity: 1.0,
+        parallaxEnabled: true,
+        parallaxOffset: .5,
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0)),
+        panelBuilder: (scrollController) => buildSlidingPanel(scrollController),
+        body: currentSongDisplay(bgColor, refresh));
   }
 
   Container currentSongDisplay(Color bgColor, Function refreshMainBody) {
     void refresh() {
       refreshMainBody();
     }
+
     return Container(
-      color: bgColor,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          SongSource(songSource: songSource),
-          SongImage(),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                VoteSkipButton(),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  child: buildSongInfo(),
-                ),
-                SongOptionsButton(
-                  songSource: songSource,
-                  song: songs[0],
-                  refreshList: refresh,
-                ),
-              ],
+        color: bgColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            SongSource(songSource: songSource),
+            SongImage(),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  VoteSkipButton(),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: buildSongInfo(),
+                  ),
+                  SongOptionsButton(
+                    songSource: songSource,
+                    song: songs[0],
+                    refreshList: refresh,
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Container(
-              child: PlaybackControls(),
+            Expanded(
+              child: Container(
+                child: PlaybackControls(),
+              ),
             ),
-          ),
-        ],
-      )
-    );
+          ],
+        ));
   }
 
   Widget buildSlidingPanel(ScrollController sc) {
     void refresh() {
       setState(() {});
     }
+
     return MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      child: Stack(
-        children: [
+        context: context,
+        removeTop: true,
+        child: Stack(children: [
           ListView(controller: sc, children: <Widget>[
             SizedBox(height: 30.0),
             Row(
@@ -144,9 +144,8 @@ class _MusicRoomState extends State<MusicRoom> {
                   width: 30,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.all(Radius.circular(12.0))
-                  ),
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.all(Radius.circular(12.0))),
                 ),
               ],
             ),
@@ -160,16 +159,15 @@ class _MusicRoomState extends State<MusicRoom> {
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.only(left: 10),
-                  child: Text(
-                    'Up Next',
-                    style: TextStyle(
-                      color: Colors.cyan,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ),
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      'Up Next',
+                      style: TextStyle(
+                        color: Colors.cyan,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )),
                 Container(
                   alignment: Alignment.centerRight,
                   padding: EdgeInsets.only(left: 220, right: 10),
@@ -179,13 +177,11 @@ class _MusicRoomState extends State<MusicRoom> {
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Colors.deepOrange, Colors.orange[100]]
-                        )
-                      ),
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Colors.deepOrange, Colors.orange[100]])),
                       child: Icon(Icons.add, color: Colors.grey[850]),
                     ),
                     onPressed: () {
@@ -199,19 +195,18 @@ class _MusicRoomState extends State<MusicRoom> {
               height: 5.0,
             ),
             Container(
-              child: Column(
-                // Iterates through song list to create tiles
-                children: songs.sublist(1).map((i) => new SlidableWidget(
-                  child: UpcomingSongList(song: i, refreshList: refresh),
-                  key: Key('i.name ' + i.artist),
-                  song: i
-                )).toList()
-              )
-            ),
+                child: Column(
+                    // Iterates through song list to create tiles
+                    children: songs
+                        .sublist(1)
+                        .map((i) => new SlidableWidget(
+                            child:
+                                UpcomingSongList(song: i, refreshList: refresh),
+                            key: Key('i.name ' + i.artist),
+                            song: i))
+                        .toList())),
           ]),
-        ]
-      )
-    );
+        ]));
   }
 
   Column buildSongInfo() {
@@ -228,13 +223,12 @@ class _MusicRoomState extends State<MusicRoom> {
           ),
         ),
         MarqueeWidget(
-          child: Text(
-            songs[0].artist,
-            style: TextStyle(
-              color: Colors.grey,
-            ),
-          )
-        ),
+            child: Text(
+          songs[0].artist,
+          style: TextStyle(
+            color: Colors.grey,
+          ),
+        )),
       ],
     );
   }
@@ -423,8 +417,7 @@ class SongOptionsButton extends StatefulWidget {
 
   @override
   _SongOptionsButtonState createState() => _SongOptionsButtonState(
-    songSource: songSource, song: song, refreshList: refreshList
-  );
+      songSource: songSource, song: song, refreshList: refreshList);
 }
 
 class _SongOptionsButtonState extends State<SongOptionsButton> {
@@ -451,11 +444,13 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
       onSelected: (value) {
         // Remove song
         if (value == 6) {
+          firstTimeLoading = false;
           songs.remove(song);
           widget.refreshList();
         }
         // Skip song
         if (value == 7) {
+          firstTimeLoading = false;
           songs.remove(song);
           widget.refreshList();
         }
@@ -482,46 +477,50 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
             ],
           ),
         ),
-        if (admin && !currentlyPlaying) PopupMenuItem(
-          value: 4,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Upvote'),
-              Icon(Icons.thumb_up),
-            ],
+        if (admin && !currentlyPlaying)
+          PopupMenuItem(
+            value: 4,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Upvote'),
+                Icon(Icons.thumb_up),
+              ],
+            ),
           ),
-        ),
-        if (admin && !currentlyPlaying) PopupMenuItem(
-          value: 5,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Downvote'),
-              Icon(Icons.thumb_down),
-            ],
+        if (admin && !currentlyPlaying)
+          PopupMenuItem(
+            value: 5,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Downvote'),
+                Icon(Icons.thumb_down),
+              ],
+            ),
           ),
-        ),
-        if (admin && !currentlyPlaying) PopupMenuItem(
-          value: 6,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Remove'),
-              Icon(Icons.delete),
-            ],
+        if (admin && !currentlyPlaying)
+          PopupMenuItem(
+            value: 6,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Remove'),
+                Icon(Icons.delete),
+              ],
+            ),
           ),
-        ),
-        if (admin && currentlyPlaying) PopupMenuItem(
-          value: 7,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Skip Song'),
-              Icon(Icons.skip_next),
-            ],
+        if (admin && currentlyPlaying)
+          PopupMenuItem(
+            value: 7,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Skip Song'),
+                Icon(Icons.skip_next),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
@@ -719,11 +718,8 @@ void setSongs() {
   // Prevent the list from growing on quick refresh and reentering the room.
   if (songs.length < numSongs) {
     for (int i = 1; i <= numSongs; i++) {
-      Song newSong = new Song(
-          'Song ' + i.toString(),
-          'artist ' + i.toString(),
-          'assets/images/song_placeholder.png',
-          'Group 15');
+      Song newSong = new Song('Song ' + i.toString(), 'artist ' + i.toString(),
+          'assets/images/song_placeholder.png', 'Group 15');
       songs.add(newSong);
     }
     Song longSong = new Song(
@@ -757,55 +753,50 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 7),
-      height: 70.0,
-      color: Colors.grey[850],
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 3,
-          vertical: 3,
-        ),
-        leading: admin
-          ? Wrap(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(0.0),
-                  width: 30,
-                  child: IconButton(
-                    alignment: Alignment.centerLeft,
-                    icon: Icon(Icons.arrow_upward),
-                    onPressed: () {
-                      moveSongUp(song);
-                      widget.refreshList();
-                    }
-                  )
-                ),
-                Container(
-                  padding: EdgeInsets.all(0.0),
-                  width: 30,
-                  child: IconButton(
-                    alignment: Alignment.centerLeft,
-                    icon: Icon(Icons.arrow_downward),
-                    onPressed: () {
-                      moveSongDown(song);
-                      widget.refreshList();
-                    }
-                  )
-                ),
-              ]
-          )
-          : Image.asset(
-              song.imagePath,
-              width: 40,
-              fit: BoxFit.cover,
+        padding: EdgeInsets.only(left: 7),
+        height: 70.0,
+        color: Colors.grey[850],
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 3,
+            vertical: 3,
           ),
+          leading: admin
+              ? Wrap(children: [
+                  Container(
+                      padding: EdgeInsets.all(0.0),
+                      width: 30,
+                      child: IconButton(
+                          alignment: Alignment.centerLeft,
+                          icon: Icon(Icons.arrow_upward),
+                          onPressed: () {
+                            moveSongUp(song);
+                            widget.refreshList();
+                          })),
+                  Container(
+                      padding: EdgeInsets.all(0.0),
+                      width: 30,
+                      child: IconButton(
+                          alignment: Alignment.centerLeft,
+                          icon: Icon(Icons.arrow_downward),
+                          onPressed: () {
+                            moveSongDown(song);
+                            widget.refreshList();
+                          })),
+                ])
+              : Image.asset(
+                  song.imagePath,
+                  width: 40,
+                  fit: BoxFit.cover,
+                ),
           title: Row(
             children: [
-              if (admin) Image.asset(
-                song.imagePath,
-                width: 40,
-                fit: BoxFit.cover,
-              ),
+              if (admin)
+                Image.asset(
+                  song.imagePath,
+                  width: 40,
+                  fit: BoxFit.cover,
+                ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -850,20 +841,18 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
                         this.setState(() {});
                       }),
                 ),
-              if (!admin) Container(
-                padding: EdgeInsets.all(0.2),
-                width: 40.0,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.thumb_down,
-                    color: song.downvoted ? Colors.red : Colors.white
-                  ),
-                  onPressed: () {
-                    _onDownvoteIconPressed(song);
-                    this.setState(() {});
-                  }
+              if (!admin)
+                Container(
+                  padding: EdgeInsets.all(0.2),
+                  width: 40.0,
+                  child: IconButton(
+                      icon: Icon(Icons.thumb_down,
+                          color: song.downvoted ? Colors.red : Colors.white),
+                      onPressed: () {
+                        _onDownvoteIconPressed(song);
+                        this.setState(() {});
+                      }),
                 ),
-              ),
               Container(
                 padding: EdgeInsets.only(right: 20.0),
                 width: 50.0,
@@ -875,8 +864,7 @@ class _UpcomingSongListState extends State<UpcomingSongList> {
               )
             ],
           ),
-      )
-    );
+        ));
   }
 }
 
@@ -930,60 +918,55 @@ class SlidableWidget<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Slidable(
-      actionPane: SlidableDrawerActionPane(),
-      child: child,
-      actionExtentRatio: 0.0,
-      key: key,
-      dismissal: SlidableDismissal(
-        dismissThresholds: <SlideActionType, double>{
-          SlideActionType.primary: 0.1,
-          SlideActionType.secondary: 0.1,
-        },
-        child: SlidableDrawerDismissal(),
-        onWillDismiss: (SlideActionType actionType) {
-          if (actionType == SlideActionType.primary) {
-            song.upvote();
-          }
-          if (actionType == SlideActionType.secondary) {
-            song.downvote();
-          }
-          return false;
-        },
-      ),
-      // Sliding left for upvote:
-      actions: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [Colors.green[100], Colors.green[300]]
-            ),
-          ),
-          child: IconSlideAction(
-            caption: 'Upvote',
-            color: Colors.transparent,
-            icon: Icons.thumb_up,
-          )
+        actionPane: SlidableDrawerActionPane(),
+        child: child,
+        actionExtentRatio: 0.0,
+        key: key,
+        dismissal: SlidableDismissal(
+          dismissThresholds: <SlideActionType, double>{
+            SlideActionType.primary: 0.1,
+            SlideActionType.secondary: 0.1,
+          },
+          child: SlidableDrawerDismissal(),
+          onWillDismiss: (SlideActionType actionType) {
+            if (actionType == SlideActionType.primary) {
+              song.upvote();
+            }
+            if (actionType == SlideActionType.secondary) {
+              song.downvote();
+            }
+            return false;
+          },
         ),
-      ],
-      // Sliding right for downvote:
-      secondaryActions: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [Colors.red[100], Colors.red[300]]
-            ),
-          ),
-          child: IconSlideAction(
-            caption: 'Downvote',
-            color: Colors.transparent,
-            icon: Icons.thumb_down,
-          )
-        ),
-      ]
-    );
+        // Sliding left for upvote:
+        actions: <Widget>[
+          Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [Colors.green[100], Colors.green[300]]),
+              ),
+              child: IconSlideAction(
+                caption: 'Upvote',
+                color: Colors.transparent,
+                icon: Icons.thumb_up,
+              )),
+        ],
+        // Sliding right for downvote:
+        secondaryActions: <Widget>[
+          Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [Colors.red[100], Colors.red[300]]),
+              ),
+              child: IconSlideAction(
+                caption: 'Downvote',
+                color: Colors.transparent,
+                icon: Icons.thumb_down,
+              )),
+        ]);
   }
 }
