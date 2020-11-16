@@ -331,30 +331,47 @@ class MemberListDrawer extends StatefulWidget {
 class _MemberListDrawerState extends State<MemberListDrawer> {
   @override
   Widget build(BuildContext context) {
-    List<ListTile> roomMembers = Members.members.map(
+    List<PopupMenuButton> roomMembers = Members.members.map(
       (String member) {
-        return ListTile(
-          visualDensity: VisualDensity(vertical: 2),
-          title: Container(
-            child: Row(
-              children: [
-                Icon(
-                  Icons.person,
-                  size: 30,
-                ),
-                Flexible(
-                  child: Container(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      member,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 18,
+        return PopupMenuButton(
+          offset: Offset.fromDirection(-3.14, 500),
+          onSelected: (value) {
+            Members.removeMember(value);
+            setState(() {});
+          },
+          itemBuilder: (context) => <PopupMenuEntry>[
+            PopupMenuItem(
+              child: Text(member),
+            ),
+            PopupMenuDivider(),
+            PopupMenuItem(
+              value: member,
+              child: Text("Ban"),
+            )
+          ],
+          child: ListTile(
+            visualDensity: VisualDensity(vertical: 2),
+            title: Container(
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.person,
+                    size: 30,
+                  ),
+                  Flexible(
+                    child: Container(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        member,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
