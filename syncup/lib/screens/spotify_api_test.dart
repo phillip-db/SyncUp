@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:spotify/spotify.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:uni_links/uni_links.dart';
@@ -17,6 +18,37 @@ class SpotifyApiTest extends StatefulWidget {
 
   @override
   _SpotifyApiTestState createState() => _SpotifyApiTestState();
+}
+
+class Album {
+  final int userId;
+  final int id;
+  final String title;
+
+  Album({this.userId, this.id, this.title});
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return Album(
+      userId: json['userId'],
+      id: json['id'],
+      title: json['title'],
+    );
+  }
+}
+
+Future<Album> fetchAlbum() async {
+  final response =
+      await http.get('https://jsonplaceholder.typicode.com/albums/1');
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return Album.fromJson(jsonDecode(response.body));
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
 }
 
 getArtistName() async {
@@ -63,9 +95,12 @@ listenFunc(redirectUri) async {
 }
 
 class _SpotifyApiTestState extends State<SpotifyApiTest> {
+  Future<Album> futureAlbum;
+
   void initState() {
     super.initState();
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    futureAlbum = fetchAlbum();
   }
 
   // These are HARDCODED Values of My Personal (Daniel Rugutt's) Spotify Client ID
@@ -118,6 +153,22 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Container(
+                height: 50,
+                child: FutureBuilder<Album>(
+                  future: futureAlbum,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Text("Http Test Title: ${snapshot.data.title}");
+                    } else if (snapshot.hasError) {
+                      return Text("${snapshot.error}");
+                    }
+
+                    // By default, show a loading spinner.
+                    return CircularProgressIndicator();
+                  },
+                ),
+              ),
               SizedBox(
                 width: 500.0,
                 height: 500.0,
