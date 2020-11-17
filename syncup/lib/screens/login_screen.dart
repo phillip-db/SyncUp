@@ -9,10 +9,11 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text('Login Screen'),
       ),
       body: Container(
-        decoration: gradientBackground(),
+        decoration: opacityBackground(),
         child: Center(
           child: RaisedButton(
             child: Text('Launch screen'),

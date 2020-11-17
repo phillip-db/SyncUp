@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:syncup/routes.dart';
 import 'package:syncup/screens/login_screen.dart';
-import 'package:syncup/screens/main_screen.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'SyncUp',
       theme: ThemeData(
-        primaryColor: Colors.grey[900],
-        accentColor: Colors.black87,
+        brightness: Brightness.dark,
+        backgroundColor: Colors.grey[900],
+        textTheme: TextTheme(
+          caption: TextStyle(
+            fontSize: 12,
+          ),
+          headline4: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
       initialRoute: LoginScreen.route,
       routes: getRoutes(),
@@ -20,11 +35,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-BoxDecoration gradientBackground() {
+BoxDecoration opacityBackground() {
   return BoxDecoration(
-    gradient: LinearGradient(
-        begin: Alignment.topRight,
-        end: Alignment.bottomLeft,
-        colors: [Colors.grey[600], Colors.grey[850]]),
+    color: Colors.white,
   );
 }
