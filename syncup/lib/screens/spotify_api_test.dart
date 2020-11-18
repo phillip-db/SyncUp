@@ -6,6 +6,7 @@ import 'package:spotify/spotify.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
+import 'package:syncup/screens/music_screen_test.dart';
 import 'package:uni_links/uni_links.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
@@ -16,6 +17,22 @@ class SpotifyApiTest extends StatefulWidget {
 
   @override
   _SpotifyApiTestState createState() => _SpotifyApiTestState();
+}
+
+class Spotify {
+  final String clientId;
+  final String clientSecret;
+  final String redirectUri;
+
+  Spotify({this.clientId, this.clientSecret, this.redirectUri});
+
+  factory Spotify.fromJson(Map<String, dynamic> json) {
+    return Spotify(
+      clientId: json['clientId'],
+      clientSecret: json['clientSecret'],
+      redirectUri: json['redirectUri'],
+    );
+  }
 }
 
 class Album {
@@ -49,53 +66,52 @@ Future<Album> fetchAlbum() async {
   }
 }
 
+Future<Spotify> fetchSpotifyData() async {
+  String jsonString =
+      await rootBundle.loadString('assets/json/spotify_data.json');
+  return Spotify.fromJson(jsonDecode(jsonString));
+}
+
 redirect(authUri) async {
   if (await canLaunch(authUri)) {
     await launch(authUri);
   }
 }
 
-listenFunc(redirectUri) async {
-  final linksStream = getLinksStream().listen((String link) async {
-    if (link.startsWith(redirectUri)) {
-      return link;
-    }
-  });
-}
-
-Future<String> _loadSpotifyAsset() async {
-  return await rootBundle.loadString('assets/json/spotify_data.json');
-}
-
-loadSpotifyData() async {
-  String jsonString = await _loadSpotifyAsset();
-  final jsonResponse = jsonDecode(jsonString);
-  return jsonResponse;
-}
-
-getClientId(List<dynamic> spotifyData) {
-  return spotifyData[0];
-}
-
-List<dynamic> spotifyData = loadSpotifyData();
-String clientId = spotifyData[0];
-String clientSecret = spotifyData[1];
-String redirectUri;
+//Load data from json file
+String clientId;
+String clientSecret;
+String theRedirectUri;
 
 class _SpotifyApiTestState extends State<SpotifyApiTest> {
+  //Future<Spotify> futureSpotifyData;
   Future<Album> futureAlbum;
+  SpotifyApi spotify;
+
+  final Completer<WebViewController> _controller =
+      Completer<WebViewController>();
+
+  /*
+  String clientId;
+  String clientSecret;
+  String theRedirectUri;
+  */
 
   void initState() {
     super.initState();
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
     futureAlbum = fetchAlbum();
+    //futureSpotifyData = fetchSpotifyData();
   }
 
-  // These are HARDCODED Values of My Personal (Daniel Rugutt's) Spotify Client ID
-  static final credentials = SpotifyApiCredentials(
-      "1278dc16cce24493bdf1e1101ec23c50", "d894b888bcaf4c8f880be8478d40b400");
+  static final clientId = "1278dc16cce24493bdf1e1101ec23c50";
+  static final clientSecret = "d894b888bcaf4c8f880be8478d40b400";
+  static final theRedirectUri = "http://localhost:8888/callback/";
+
+  static final credentials = SpotifyApiCredentials(clientId, clientSecret);
+
   static final grant = SpotifyApi.authorizationCodeGrant(credentials);
-  static final redirectUri = 'http://localhost:8888/callback/';
+  static final redirectUri = theRedirectUri;
 
   //Small portion of scopes we can ask for during spotify authorization
   static final scopes = ['user-read-email', 'user-library-read'];
@@ -105,11 +121,7 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
     scopes: scopes, // scopes are optional
   );
 
-  redirect(authUri) => setState(() {});
-
-  static var responseUri = listenFunc(redirectUri);
-
-  static final spotify = SpotifyApi.fromAuthCodeGrant(grant, responseUri);
+  var responseUri;
 
   @override
   Widget build(BuildContext context) {
@@ -138,16 +150,51 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
                   },
                 ),
               ),
+              /*
+              FutureBuilder<Spotify>(
+                  future: futureSpotifyData,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      clientId = snapshot.data.clientId;
+                      clientSecret = snapshot.data.clientSecret;
+                      theRedirectUri = snapshot.data.redirectUri;
+
+                      credentials =
+                          SpotifyApiCredentials(clientId, clientSecret);
+
+                      grant = SpotifyApi.authorizationCodeGrant(credentials);
+                      redirectUri = theRedirectUri;
+
+                      //Small portion of scopes we can ask for during spotify authorization
+                      scopes = ['user-read-email', 'user-library-read'];
+
+                      authUri = grant.getAuthorizationUrl(
+                        Uri.parse(redirectUri),
+                        scopes: scopes, // scopes are optional
+                      );
+                    }
+                    // By default, show a loading spinner.
+                    return CircularProgressIndicator();
+                  }),
+                  */
               Expanded(
                 child: WebView(
                     javascriptMode: JavascriptMode.unrestricted,
                     initialUrl: authUri.toString(),
+                    onWebViewCreated: (WebViewController webViewController) {
+                      _controller.complete(webViewController);
+                    },
                     navigationDelegate: (navReq) {
                       if (navReq.url.startsWith(redirectUri)) {
                         responseUri = navReq.url;
+                        spotify =
+                            SpotifyApi.fromAuthCodeGrant(grant, responseUri);
+                        //String json = jsonEncode(spotify);
+                        Navigator.pushNamed(context, MusicScreenTest.route);
                         return NavigationDecision.prevent;
+                      } else {
+                        return NavigationDecision.navigate;
                       }
-                      return NavigationDecision.navigate;
                     }),
               ),
             ],

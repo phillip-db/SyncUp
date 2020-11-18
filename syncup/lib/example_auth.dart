@@ -42,7 +42,7 @@ Future<SpotifyApi> _getUserAuthenticatedSpotifyApi(
 }
 
 void _currentlyPlaying(SpotifyApi spotify) async =>
-    await spotify.me.currentlyPlaying().then((a) {
+    await spotify.me.currentlyPlaying.then((a) {
       if (a == null) {
         print('Nothing currently playing.');
         return;
