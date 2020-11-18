@@ -1,9 +1,7 @@
-// Copyright (c) 2017, 2020 rinukkusu, hayribakici. All rights reserved. Use of this source code
-// is governed by a BSD-style license that can be found in the LICENSE file.
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:spotify/spotify.dart';
 import 'package:http/http.dart' as http;
 
@@ -64,6 +62,25 @@ listenFunc(redirectUri) async {
     }
   });
 }
+
+Future<String> _loadSpotifyAsset() async {
+  return await rootBundle.loadString('assets/json/spotify_data.json');
+}
+
+loadSpotifyData() async {
+  String jsonString = await _loadSpotifyAsset();
+  final jsonResponse = jsonDecode(jsonString);
+  return jsonResponse;
+}
+
+getClientId(List<dynamic> spotifyData) {
+  return spotifyData[0];
+}
+
+List<dynamic> spotifyData = loadSpotifyData();
+String clientId = spotifyData[0];
+String clientSecret = spotifyData[1];
+String redirectUri;
 
 class _SpotifyApiTestState extends State<SpotifyApiTest> {
   Future<Album> futureAlbum;
