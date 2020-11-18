@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncup/routes.dart';
+import 'package:syncup/screens/home_screen.dart';
 import 'package:syncup/screens/login_screen.dart';
 import 'package:syncup/screens/main_screen.dart';
 import 'screens/spotify_api_test.dart';
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.grey[900],
         accentColor: Colors.black87,
       ),
-      initialRoute: SpotifyApiTest.route,
+      initialRoute: HomeScreen.route,
       routes: getRoutes(),
     );
   }

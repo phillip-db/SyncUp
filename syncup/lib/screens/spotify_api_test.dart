@@ -51,35 +51,6 @@ Future<Album> fetchAlbum() async {
   }
 }
 
-getArtistName() async {
-  final credentials = SpotifyApiCredentials(
-      "1278dc16cce24493bdf1e1101ec23c50", "d894b888bcaf4c8f880be8478d40b400");
-  final spotify = SpotifyApi(credentials);
-  var theArtist = await spotify.artists.get('5K4W6rqBFWDnAN6FQUkS6x');
-  return theArtist.name;
-}
-
-getAlbumName() async {
-  final credentials = SpotifyApiCredentials(
-      "1278dc16cce24493bdf1e1101ec23c50", "d894b888bcaf4c8f880be8478d40b400");
-  final spotify = SpotifyApi(credentials);
-  var album = await spotify.albums.get('4Uv86qWpGTxf7fU7lG5X6F');
-  return album.name;
-}
-
-getAlbumList() async {
-  final credentials = SpotifyApiCredentials(
-      "1278dc16cce24493bdf1e1101ec23c50", "d894b888bcaf4c8f880be8478d40b400");
-  final spotify = SpotifyApi(credentials);
-  var albumList =
-      await spotify.albums.getTracks('4Uv86qWpGTxf7fU7lG5X6F').all();
-  String concatList = "";
-  albumList.forEach((track) {
-    concatList += track.name + "\n";
-  });
-  return concatList;
-}
-
 redirect(authUri) async {
   if (await canLaunch(authUri)) {
     await launch(authUri);
@@ -106,9 +77,8 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
   // These are HARDCODED Values of My Personal (Daniel Rugutt's) Spotify Client ID
   static final credentials = SpotifyApiCredentials(
       "1278dc16cce24493bdf1e1101ec23c50", "d894b888bcaf4c8f880be8478d40b400");
-
   static final grant = SpotifyApi.authorizationCodeGrant(credentials);
-  static final redirectUri = 'http://cs196.cs.illinois.edu/';
+  static final redirectUri = 'http://localhost:8888/callback/';
 
   //Small portion of scopes we can ask for during spotify authorization
   static final scopes = ['user-read-email', 'user-library-read'];
@@ -123,24 +93,6 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
   static var responseUri = listenFunc(redirectUri);
 
   static final spotify = SpotifyApi.fromAuthCodeGrant(grant, responseUri);
-
-  String albumName = "";
-  String artistName = "";
-  String albumList = "";
-
-  _SpotifyApiTestState() {
-    getAlbumName().then((val) => setState(() {
-          albumName = val;
-        }));
-
-    getArtistName().then((val) => setState(() {
-          artistName = val;
-        }));
-
-    getAlbumList().then((val) => setState(() {
-          albumList = val;
-        }));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,9 +121,7 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
                   },
                 ),
               ),
-              SizedBox(
-                width: 500.0,
-                height: 500.0,
+              Expanded(
                 child: WebView(
                     javascriptMode: JavascriptMode.unrestricted,
                     initialUrl: authUri.toString(),
