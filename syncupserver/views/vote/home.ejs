@@ -5,50 +5,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Vote</title>
+  <style>
+    html, body, div, span, applet, object, iframe,
+    h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+    a, abbr, acronym, address, big, cite, code,
+    del, dfn, em, img, ins, kbd, q, s, samp,
+    small, strike, strong, sub, sup, tt, var,
+    b, u, i, center,
+    dl, dt, dd, ol, ul, li,
+    fieldset, form, label, legend,
+    table, caption, tbody, tfoot, thead, tr, th, td,
+    article, aside, canvas, details, embed,
+    figure, figcaption, footer, header, hgroup,
+    menu, nav, output, ruby, section, summary,
+    time, mark, audio, video {
+    	margin: 0;
+    	padding: 0;
+    	border: 0;
+    	font-size: 100%;
+    	font: inherit;
+    	vertical-align: baseline;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    /* HTML5 display-role reset for older browsers */
+    article, aside, details, figcaption, figure,
+    footer, header, hgroup, menu, nav, section {
+    	display: block;
+    }
+    body {
+      text-align: center;
+    	line-height: 1.6;
+    }
+    ol, ul {
+    	list-style: none;
+    }
+    blockquote, q {
+    	quotes: none;
+    }
+    blockquote:before, blockquote:after,
+    q:before, q:after {
+    	content: '';
+    	content: none;
+    }
+    table {
+    	border-collapse: collapse;
+    	border-spacing: 0;
+    }
+
+    h1 {
+      font-size: 40px;
+    }
+
+    h2 {
+      font-size: 30px;
+    }
+
+    h3 {
+      font-size: 26px;
+    }
+
+    .container {
+      box-sizing: border-box;
+      padding: 30px 100px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Rooms Available:</h1>
-  <ul>
-    <% for (x in songdata) { %>
-      <li><%= x %></li>
-    <% } %>
-  </ul>
-
-  <form action="/room/modify" method="get">
-    <h2>Update Room Properties:</h2>
-    <label for="roomname">Roomname: </label>
-    <select onchange="updateSongInfo()" id="selectedRoom" name="roomname">
+  <div class="container">
+    <h1>Rooms Available:</h1>
+    <ul>
       <% for (x in songdata) { %>
-        <option value="<%= x %>"><%= x %></option>
+        <li><%= x %></li>
       <% } %>
-    </select><br>
-    <h3>Song Info:</h3> <!-- use js to dynamically update info from above option -->
-    <div>
-      <ul id="songInfoBox">
-        <li>Please select a room from above to modify the following</li>
-      </ul>
-    </div>
-    <h3>Updates:</h3>
-    <p>(Leave empty values for room info)</p>
-    <label for="addsong">Add Song: </label>
-    <input type="text" name="addsong">
+    </ul>
+    <hr>
+    <form action="/room/modify" method="get">
+      <h2>Update Room Properties:</h2>
+      <label for="roomname">Roomname: </label>
+      <select onchange="updateSongInfo()" id="selectedRoom" name="roomname">
+        <option value=""></option>
+        <% for (x in songdata) { %>
+          <option value="<%= x %>"><%= x %></option>
+        <% } %>
+      </select>
+      <br>
+      <br>
+      <form action="/" method="post">
+        <h2>New Room</h2>
+        <label for="roomname">Room Name: </label><input name="roomname" type="text"><br>
+        <input type="submit" value="Create Room">
+      </form>
+      <hr>
+      <h3>Song Info:</h3> <!-- use js to dynamically update info from above option -->
+      <div>
+        <ul id="songInfoBox">
+          <li>Please select a room from above to modify the following:</li>
+        </ul>
+      </div>
+      <br>
+      <h3>Updates:</h3>
+      <p>(Leave empty values for room info)</p>
+      <label for="addsong">Add Song: </label>
+      <input type="text" name="addsong">
+      <br>
+      <label for="upvotesong">Upvote Song: </label>
+      <select name="upvotesong" id="upvotesong"></select>
+      <br>
+      <label for="downvotesong">Downvote Song: </label>
+      <select name="downvotesong" id="downvotesong"></select>
+      <br>
+      <label for="removesong">Remove Song: </label>
+      <select name="removesong" id="removesong"></select>
+      <br>
+      <input type="submit" value="Update Song List">
+    </form>
     <br>
-    <label for="upvotesong">Upvote Song: </label>
-    <select name="upvotesong" id="upvotesong"></select>
-    <br>
-    <label for="downvotesong">Downvote Song: </label>
-    <select name="downvotesong" id="downvotesong"></select>
-    <br>
-    <label for="removesong">Remove Song: </label>
-    <select name="removesong" id="removesong"></select>
-    <br>
-    <input type="submit" value="Update Song List">
-  </form>
-  <form action="/" method="post">
-    <h2>New Room</h2>
-    <label for="roomname">Room Name: </label><input name="roomname" type="text">
-    <input type="submit" value="Create Room">
-  </form>
+  </div>
 
   <script>
     let songInfoBox = document.getElementById("songInfoBox");
