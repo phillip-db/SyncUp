@@ -8,10 +8,6 @@ var rooms = {
     "Giant Steps": 13, // song and votes, once played it gets deleted. Objects help so no song repeats
     "Spiral": 19
   },
-  "cs196music": {
-    "Call me maybe": 1, //inital value if called
-    "Sure": 2
-  }
 }
 
 // room songs next,played,votes
