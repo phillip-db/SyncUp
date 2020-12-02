@@ -1,5 +1,5 @@
 {
 	"clientId": "1278dc16cce24493bdf1e1101ec23c50",
 	"clientSecret": "d894b888bcaf4c8f880be8478d40b400",
-	"redirectUri": "http://localhost:8888/callback/",
+	"redirectUri": "http://localhost:8888/callback/"
 }

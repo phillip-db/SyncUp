@@ -35,6 +35,16 @@ class Spotify {
   }
 }
 
+Future<Map<String, dynamic>> backendTest() async {
+  final response = await http.get(
+      'https://delete-miz39.ondigitalocean.app/room/modify?roomname=gamerroom');
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception('Failed to load room');
+  }
+}
+
 class Album {
   final int userId;
   final int id;
@@ -87,6 +97,7 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
   //Future<Spotify> futureSpotifyData;
   Future<Album> futureAlbum;
   SpotifyApi spotify;
+  Future<Map<String, dynamic>> songs;
 
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
@@ -101,6 +112,7 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
     super.initState();
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
     futureAlbum = fetchAlbum();
+    songs = backendTest();
     //futureSpotifyData = fetchSpotifyData();
   }
 
@@ -141,6 +153,26 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return Text("Http Test Title: ${snapshot.data.title}");
+                    } else if (snapshot.hasError) {
+                      return Text("${snapshot.error}");
+                    }
+
+                    // By default, show a loading spinner.
+                    return CircularProgressIndicator();
+                  },
+                ),
+              ),
+              Container(
+                height: 50,
+                child: FutureBuilder<Map<String, dynamic>>(
+                  future: songs,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<String> songList = [];
+                      snapshot.data.forEach((key, value) {
+                        songList.add("$key: $value");
+                      });
+                      return Text("Backend Test - ${songList.toString()}");
                     } else if (snapshot.hasError) {
                       return Text("${snapshot.error}");
                     }
