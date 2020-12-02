@@ -40,25 +40,26 @@ class _MusicRoomState extends State<MusicRoom> {
 
     Offset _pointerDownPosition;
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
-        appBar: buildAppBar(),
-        endDrawer: MemberListDrawer(),
-        // Detects swipe down to go to add song screen
-        body: Listener(
-          child: swipeUpPanel(context, bgColor, refresh),
-          onPointerDown: (details) {
-            if (slidingPanelOpen) {
-              _pointerDownPosition = Offset.infinite;
-            } else {
-              _pointerDownPosition = details.position;
-            }
-          },
-          onPointerUp: (details) {
-            if (details.position.dy - _pointerDownPosition.dy > 100.0) {
-              Navigator.pushNamed(context, SongScreen.route);
-            }
-          },
-        ));
+      backgroundColor: Theme.of(context).backgroundColor,
+      appBar: buildAppBar(),
+      endDrawer: MemberListDrawer(),
+      // Detects swipe down to go to add song screen
+      body: Listener(
+        child: swipeUpPanel(context, bgColor, refresh),
+        onPointerDown: (details) {
+          if (slidingPanelOpen) {
+            _pointerDownPosition = Offset.infinite;
+          } else {
+            _pointerDownPosition = details.position;
+          }
+        },
+        onPointerUp: (details) {
+          if (details.position.dy - _pointerDownPosition.dy > 100.0) {
+            Navigator.pushNamed(context, SongScreen.route);
+          }
+        },
+      )
+    );
   }
 
   SlidingUpPanel swipeUpPanel(
@@ -68,22 +69,24 @@ class _MusicRoomState extends State<MusicRoom> {
     }
 
     return SlidingUpPanel(
-        onPanelOpened: () {
-          slidingPanelOpen = true;
-        },
-        onPanelClosed: () {
-          slidingPanelOpen = false;
-        },
-        color: Colors.grey[850],
-        minHeight: 60,
-        maxHeight: MediaQuery.of(context).size.height * 0.85,
-        backdropOpacity: 1.0,
-        parallaxEnabled: true,
-        parallaxOffset: .5,
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0)),
-        panelBuilder: (scrollController) => buildSlidingPanel(scrollController),
-        body: currentSongDisplay(bgColor, refresh));
+      onPanelOpened: () {
+        slidingPanelOpen = true;
+      },
+      onPanelClosed: () {
+        slidingPanelOpen = false;
+      },
+      color: Colors.grey[850],
+      minHeight: 60,
+      maxHeight: MediaQuery.of(context).size.height * 0.85,
+      backdropOpacity: 1.0,
+      parallaxEnabled: true,
+      parallaxOffset: .5,
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(18.0), 
+        topRight: Radius.circular(18.0)
+      ),
+      panelBuilder: (scrollController) => buildSlidingPanel(scrollController),
+      body: currentSongDisplay(bgColor, refresh));
   }
 
   Container currentSongDisplay(Color bgColor, Function refreshMainBody) {
@@ -92,38 +95,39 @@ class _MusicRoomState extends State<MusicRoom> {
     }
 
     return Container(
-        color: bgColor,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            SongSource(songSource: songSource),
-            SongImage(),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  VoteSkipButton(),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    child: buildSongInfo(),
-                  ),
-                  SongOptionsButton(
-                    songSource: songSource,
-                    song: songs[0],
-                    refreshList: refresh,
-                  ),
-                ],
-              ),
+      color: bgColor,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          SongSource(songSource: songSource),
+          SongImage(),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                VoteSkipButton(),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  child: buildSongInfo(),
+                ),
+                SongOptionsButton(
+                  songSource: songSource,
+                  song: songs[0],
+                  refreshList: refresh,
+                ),
+              ],
             ),
-            Expanded(
-              child: Container(
-                child: PlaybackControls(),
-              ),
+          ),
+          Expanded(
+            child: Container(
+              child: PlaybackControls(),
             ),
-          ],
-        ));
+          ),
+        ],
+      )
+    );
   }
 
   Widget buildSlidingPanel(ScrollController sc) {
@@ -132,33 +136,36 @@ class _MusicRoomState extends State<MusicRoom> {
     }
 
     return MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: Stack(children: [
-          ListView(controller: sc, children: <Widget>[
-            SizedBox(height: 30.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  width: 30,
-                  height: 5,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.all(Radius.circular(12.0))),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 18.0,
-            ),
-            currentlyPlaying(),
-            SizedBox(
-              height: 18.0,
-            ),
-            Row(
-              children: [
-                Container(
+      context: context,
+      removeTop: true,
+      child: Stack(
+        children: [
+          ListView(
+            controller: sc, 
+            children: <Widget>[
+              SizedBox(height: 30.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: 30,
+                    height: 5,
+                    decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.all(Radius.circular(12.0))),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 18.0,
+              ),
+              currentlyPlaying(),
+              SizedBox(
+                height: 18.0,
+              ),
+              Row(
+                children: [
+                  Container(
                     padding: EdgeInsets.only(left: 10),
                     child: Text(
                       'Up Next',
@@ -167,46 +174,54 @@ class _MusicRoomState extends State<MusicRoom> {
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
-                    )),
-                Container(
-                  alignment: Alignment.centerRight,
-                  padding: EdgeInsets.only(left: 220, right: 10),
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.deepOrange,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
+                    )
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    padding: EdgeInsets.only(left: 220, right: 10),
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.deepOrange,
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Colors.deepOrange, Colors.orange[100]])),
-                      child: Icon(Icons.add, color: Colors.grey[850]),
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Colors.deepOrange, Colors.orange[100]]
+                          )
+                        ),
+                        child: Icon(Icons.add, color: Colors.grey[850]),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, SongScreen.route);
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, SongScreen.route);
-                    },
                   ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 5.0,
-            ),
-            Container(
+                ],
+              ),
+              SizedBox(
+                height: 5.0,
+              ),
+              Container(
                 child: Column(
-                    // Iterates through song list to create tiles
-                    children: songs
-                        .sublist(1)
-                        .map((i) => new SlidableWidget(
-                            child:
-                                UpcomingSongList(song: i, refreshList: refresh),
-                            key: Key('i.name ' + i.artist),
-                            song: i))
-                        .toList())),
-          ]),
-        ]));
+                  // Iterates through song list to create tiles
+                  children: songs
+                    .sublist(1)
+                    .map((i) => new SlidableWidget(
+                      child: UpcomingSongList(song: i, refreshList: refresh),
+                      key: Key('i.name ' + i.artist),
+                      song: i
+                    ))
+                    .toList()
+                )
+              ),
+            ]
+          ),
+        ]
+      )
+    );
   }
 
   Column buildSongInfo() {
@@ -223,12 +238,13 @@ class _MusicRoomState extends State<MusicRoom> {
           ),
         ),
         MarqueeWidget(
-            child: Text(
-          songs[0].artist,
-          style: TextStyle(
-            color: Colors.grey,
-          ),
-        )),
+          child: Text(
+            songs[0].artist,
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          )
+        ),
       ],
     );
   }
@@ -240,11 +256,12 @@ class _MusicRoomState extends State<MusicRoom> {
       actions: [
         Builder(
           builder: (context) => IconButton(
-              icon: Icon(
-                Icons.people,
-                size: 30,
-              ),
-              onPressed: () => Scaffold.of(context).openEndDrawer()),
+            icon: Icon(
+              Icons.people,
+              size: 30,
+            ),
+            onPressed: () => Scaffold.of(context).openEndDrawer()
+          ),
         ),
       ],
     );
@@ -344,10 +361,11 @@ class _MemberListDrawerState extends State<MemberListDrawer> {
               child: Text(member),
             ),
             PopupMenuDivider(),
-            PopupMenuItem(
-              value: member,
-              child: Text("Ban"),
-            )
+            if (admin)
+              PopupMenuItem(
+                value: member,
+                child: Text("Ban"),
+              )
           ],
           child: ListTile(
             visualDensity: VisualDensity(vertical: 2),
@@ -459,6 +477,14 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
       icon: Icon(Icons.more_vert),
       tooltip: 'Song Options',
       onSelected: (value) {
+        // Admin upvote song
+        if (value == 4) {
+          song.upvote();
+        }
+        // Admin downvote song
+        if (value == 5) {
+          song.downvote();
+        }
         // Remove song
         if (value == 6) {
           firstTimeLoading = false;
@@ -501,7 +527,8 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Upvote'),
-                Icon(Icons.thumb_up),
+                Icon(Icons.thumb_up,
+                    color: song.upvoted ? Colors.green : Colors.white),
               ],
             ),
           ),
@@ -512,7 +539,8 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Downvote'),
-                Icon(Icons.thumb_down),
+                Icon(Icons.thumb_down,
+                    color: song.downvoted ? Colors.red : Colors.white),
               ],
             ),
           ),
