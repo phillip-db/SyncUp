@@ -3,6 +3,7 @@ import 'screens/main_screen.dart';
 import 'screens/spotify_api_test.dart';
 import 'screens/home_screen.dart';
 import 'screens/music_screen_test.dart';
+import 'screens/music_room.dart';
 
 getRoutes() {
   return {
@@ -11,5 +12,6 @@ getRoutes() {
     SpotifyApiTest.route: (context) => SpotifyApiTest(),
     HomeScreen.route: (context) => HomeScreen(),
     MusicScreenTest.route: (context) => MusicScreenTest(),
+    MusicRoom.route: (context) => MusicRoom(),
   };
 }
