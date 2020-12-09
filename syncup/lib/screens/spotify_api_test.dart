@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:spotify/spotify.dart';
+import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -17,22 +18,6 @@ class SpotifyApiTest extends StatefulWidget {
 
   @override
   _SpotifyApiTestState createState() => _SpotifyApiTestState();
-}
-
-class Spotify {
-  final String clientId;
-  final String clientSecret;
-  final String redirectUri;
-
-  Spotify({this.clientId, this.clientSecret, this.redirectUri});
-
-  factory Spotify.fromJson(Map<String, dynamic> json) {
-    return Spotify(
-      clientId: json['clientId'],
-      clientSecret: json['clientSecret'],
-      redirectUri: json['redirectUri'],
-    );
-  }
 }
 
 Future<Map<String, dynamic>> backendTest() async {
@@ -61,6 +46,11 @@ class Album {
   }
 }
 
+_connectToSpotify(clientId, redirectUri) async {
+  await SpotifySdk.connectToSpotifyRemote(
+      clientId: clientId, redirectUrl: redirectUri);
+}
+
 Future<Album> fetchAlbum() async {
   final response =
       await http.get('https://jsonplaceholder.typicode.com/albums/1');
@@ -76,22 +66,29 @@ Future<Album> fetchAlbum() async {
   }
 }
 
-Future<Spotify> fetchSpotifyData() async {
-  String jsonString =
-      await rootBundle.loadString('assets/json/spotify_data.json');
-  return Spotify.fromJson(jsonDecode(jsonString));
+/*
+class Spotify {
+  final String clientId;
+  final String clientSecret;
+  final String redirectUri;
+
+  Spotify({this.clientId, this.clientSecret, this.redirectUri});
+
+  factory Spotify.fromJson(Map<String, dynamic> json) {
+    return Spotify(
+      clientId: json['clientId'],
+      clientSecret: json['clientSecret'],
+      redirectUri: json['redirectUri'],
+    );
+  }
 }
+*/
 
 redirect(authUri) async {
   if (await canLaunch(authUri)) {
     await launch(authUri);
   }
 }
-
-//Load data from json file
-String clientId;
-String clientSecret;
-String theRedirectUri;
 
 class _SpotifyApiTestState extends State<SpotifyApiTest> {
   //Future<Spotify> futureSpotifyData;
@@ -102,6 +99,7 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
 
+//Load data from json file
   /*
   String clientId;
   String clientSecret;
@@ -219,10 +217,21 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
                     navigationDelegate: (navReq) {
                       if (navReq.url.startsWith(redirectUri)) {
                         responseUri = navReq.url;
+                        // ignore: unused_local_variable
+                        SpotifySdk.connectToSpotifyRemote(
+                            clientId: clientId, redirectUrl: redirectUri);
+                        var authenticationToken = SpotifySdk.getAuthenticationToken(
+                            clientId: clientId,
+                            redirectUrl: redirectUri,
+                            scope: 'app-remote-control, '
+                                'user-modify-playback-state, '
+                                'playlist-read-private, '
+                                'playlist-modify-public,user-read-currently-playing');
                         spotify =
                             SpotifyApi.fromAuthCodeGrant(grant, responseUri);
                         //String json = jsonEncode(spotify);
-                        Navigator.pushNamed(context, MusicScreenTest.route);
+                        Navigator.pushNamed(context, MusicScreenTest.route,
+                            arguments: {'spotify': spotify});
                         return NavigationDecision.prevent;
                       } else {
                         return NavigationDecision.navigate;
