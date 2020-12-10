@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:syncup/screens/spotify_api_test.dart';
-import '../main.dart';
 
 class HomeScreen extends StatefulWidget {
   static String route = "home";

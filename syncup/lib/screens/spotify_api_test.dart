@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:spotify/spotify.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:syncup/screens/music_screen_test.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:syncup/screens/main_screen.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -137,13 +135,11 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Spotify API Test'),
-        ),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              /*
               Container(
                 height: 50,
                 child: FutureBuilder<Album>(
@@ -160,8 +156,9 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
                   },
                 ),
               ),
+              */
+              /*
               Container(
-                height: 50,
                 child: FutureBuilder<Map<String, dynamic>>(
                   future: songs,
                   builder: (context, snapshot) {
@@ -180,6 +177,7 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
                   },
                 ),
               ),
+              */
               /*
               FutureBuilder<Spotify>(
                   future: futureSpotifyData,
@@ -230,7 +228,7 @@ class _SpotifyApiTestState extends State<SpotifyApiTest> {
                         spotify =
                             SpotifyApi.fromAuthCodeGrant(grant, responseUri);
                         //String json = jsonEncode(spotify);
-                        Navigator.pushNamed(context, MusicScreenTest.route,
+                        Navigator.pushNamed(context, MainScreen.route,
                             arguments: {'spotify': spotify});
                         return NavigationDecision.prevent;
                       } else {

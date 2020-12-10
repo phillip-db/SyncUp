@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main_screen.dart';
-import 'package:syncup/screens/main_screen.dart';
+import 'package:syncup/screens/spotify_api_test.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -51,7 +50,7 @@ class TermsOfService extends StatelessWidget {
           style: TextStyle(fontSize: 12),
         ),
         onTap: () async {
-          const url = 'http://cs196.cs.illinois.edu/';
+          const url = 'http://cs196.cs.illinois.edu/'; //temporary
           if (await canLaunch(url)) {
             await launch(url);
           } else {
@@ -76,26 +75,24 @@ class LoginButton extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
           child: GestureDetector(
-            onTap: () async {
-              const url = 'https://www.spotify.com';
-              if (await canLaunch(url)) {
-                await launch(url);
-                Navigator.pushNamed(context, MainScreen.route);
-              } else {
-                throw 'Could not launch $url';
-              }
+            onTap: () {
+              Navigator.pushNamed(context, SpotifyApiTest.route);
             },
             child: Container(
               width: MediaQuery.of(context).size.width * 0.4,
-              child: Image(
-                image: AssetImage('assets/images/spotify_logo.png'),
+              child: Column(
+                children: [
+                  Image(
+                    image: AssetImage('assets/images/spotify_logo.png'),
+                  ),
+                  Text(
+                    'Log in with Spotify',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-        Text(
-          'Log in with Spotify',
-          style: TextStyle(fontSize: 18),
         ),
       ],
     );

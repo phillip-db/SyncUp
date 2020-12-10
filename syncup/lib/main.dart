@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncup/routes.dart';
-import 'package:syncup/screens/home_screen.dart';
 import 'package:syncup/screens/login_screen.dart';
-import 'package:syncup/screens/main_screen.dart';
-import 'screens/spotify_api_test.dart';
 
 void main() => runApp(MyApp());
 
@@ -36,7 +33,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
           ),
         ),
       ),
-      initialRoute: HomeScreen.route,
+      initialRoute: LoginScreen.route,
       routes: getRoutes(),
     );
   }

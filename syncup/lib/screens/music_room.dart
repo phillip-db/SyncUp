@@ -1,8 +1,19 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
+import 'package:spotify_sdk/models/connection_status.dart';
+import 'package:spotify_sdk/models/image_uri.dart';
+import 'package:spotify_sdk/models/player_state.dart';
+import 'package:spotify_sdk/spotify_sdk.dart';
+import 'package:spotify/spotify.dart' as musicroomspotify;
 import '../marquee.dart';
 import '../members.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Constant value specifying a max width as a percentage of screen width
 final double maxWidthPct = 0.75;
@@ -12,6 +23,31 @@ List<Song> songs = [];
 
 /// (Debug) Counter to prevent songs from being added on quick reloads
 int count = 0;
+
+/// Ensures all the components of the music plater are loaded and set
+bool _loading = false;
+
+/// Checks if the spotify player is able to connect to the music that was requested
+bool _connected = false;
+
+/// Logs any errors with the Spotify SDK plugin
+final Logger _logger = Logger();
+
+/// Spotify SDK plugin
+musicroomspotify.SpotifyApi spotify;
+
+/// Current Artist, Title and ImageUri (Currently Having Problems updating ImageUri)
+String currentArtist = "Default Artist";
+String currentTitle = "Default Title";
+String currentAlbum = "Default Album";
+String currentImageUri =
+    "spotify:image:ab67616d0000b2736b4f6358fbf795b568e7952d"; //default value
+String spotifyUri = "spotify:track:28UMEtwyUUy5u0UWOVHwiI"; //default value
+
+/// How far the song is from completing
+double playbackPercent = 0;
+int currentSongTime = 0;
+int songLength = 0;
 
 class MusicRoom extends StatefulWidget {
   static String route = 'music';
@@ -24,7 +60,7 @@ class _MusicRoomState extends State<MusicRoom> {
   String _roomOwner = 'Group 15(Best Group)';
   String songSource = 'Group 15';
   double songDuration = 220;
-  Song nowPlaying = Song('CS 196', 'Sami & Rohan (ft. Course Staff)',
+  Song nowPlaying = Song(currentTitle, currentArtist,
       'assets/images/song_placeholder.png', 'Group 15');
 
   @override
@@ -36,11 +72,28 @@ class _MusicRoomState extends State<MusicRoom> {
       count++;
     }
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: buildAppBar(),
-      endDrawer: MemberListDrawer(),
-      body: mainBody(context, nowPlaying.name, nowPlaying.artist, bgColor),
+    return MaterialApp(
+      home: StreamBuilder<ConnectionStatus>(
+          stream: SpotifySdk.subscribeConnectionStatus(),
+          builder: (context, snapshot) {
+            _connected = false;
+            if (snapshot.data != null) {
+              _connected = snapshot.data.connected;
+            }
+            return Scaffold(
+              backgroundColor: Theme.of(context).backgroundColor,
+              appBar: buildAppBar(),
+              endDrawer: MemberListDrawer(),
+              body: Stack(children: <Widget>[
+                _connected
+                    ? playerStateWidget()
+                    : const Center(
+                        child: Text('Not connected'),
+                      ),
+                mainBody(context, currentTitle, currentArtist, bgColor),
+              ]),
+            );
+          }),
     );
   }
 
@@ -117,7 +170,7 @@ class _MusicRoomState extends State<MusicRoom> {
         SizedBox(
           height: 18.0,
         ),
-        currentlyPlaying(new Song('CS 196', 'Sami & Rohan (ft. Course Staff)',
+        currentlyPlaying(new Song(currentTitle, currentArtist,
             'assets/images/song_placeholder.png', 'Group 15')),
         SizedBox(
           height: 18.0,
@@ -149,12 +202,17 @@ class _MusicRoomState extends State<MusicRoom> {
 
   /// Builds a song's title and artist below the image
   Column buildSongInfo(String songTitle, String songArtist) {
+    _connected
+        ? playerStateWidget()
+        : const Center(
+            child: Text('Not connected'),
+          );
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         MarqueeWidget(
           child: Text(
-            songTitle,
+            currentTitle,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
@@ -163,7 +221,7 @@ class _MusicRoomState extends State<MusicRoom> {
         ),
         MarqueeWidget(
             child: Text(
-          songArtist,
+          currentArtist,
           style: TextStyle(
             color: Colors.grey,
           ),
@@ -243,19 +301,15 @@ class _SongImageState extends State<SongImage> {
         MediaQuery.of(context).size.width * ((1 - maxWidthPct) / 3.5);
 
     return Container(
-      width: double.infinity,
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: _horizontalPadding,
-          right: _horizontalPadding,
-          top: 12,
-        ),
-        child: Image(
-          fit: BoxFit.fill,
-          image: AssetImage('assets/images/song_placeholder.png'),
-        ),
-      ),
-    );
+        width: double.infinity,
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: _horizontalPadding,
+            right: _horizontalPadding,
+            top: 12,
+          ),
+          child: spotifyImageWidget(),
+        ));
   }
 }
 
@@ -358,12 +412,18 @@ class SongOptionsButton extends StatefulWidget {
 }
 
 class _SongOptionsButtonState extends State<SongOptionsButton> {
+  Future<void> _launched;
+
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
       icon: Icon(Icons.more_vert),
       tooltip: 'Song Options',
-      onSelected: (value) {},
+      onSelected: (value) {
+        if (value == 3) {
+          _launchInBrowser();
+        }
+      },
       itemBuilder: (BuildContext context) => [
         PopupMenuItem(
           value: 1,
@@ -393,6 +453,18 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
   }
 }
 
+Future<void> _launchInBrowser() async {
+  if (await canLaunch(spotifyUri)) {
+    await launch(
+      spotifyUri,
+      forceWebView: false,
+      headers: <String, String>{'header_key': 'header_value'},
+    );
+  } else {
+    throw 'Could not launch $spotifyUri';
+  }
+}
+
 /// Playback controls for current song, includes song progress bar
 class PlaybackControls extends StatefulWidget {
   _PlaybackControlsState createState() => _PlaybackControlsState();
@@ -417,7 +489,7 @@ class _PlaybackControlsState extends State<PlaybackControls> {
             padding: const EdgeInsets.symmetric(vertical: 5),
             child: LinearProgressIndicator(
               value: seconds(_songProgress) / seconds(_songDuration),
-              backgroundColor: Colors.grey,
+              backgroundColor: Colors.grey[900],
               valueColor: AlwaysStoppedAnimation(Colors.white),
             ),
           ),
@@ -469,6 +541,22 @@ class _VoteSkipButtonState extends State<VoteSkipButton> {
 
   void _toggleVoteSkip() {
     setState(() => _isVoteSkipped = !_isVoteSkipped);
+    skipNext();
+    playerStateWidget();
+    // ignore: invalid_use_of_protected_member
+    (context as Element).reassemble();
+  }
+
+  Future<void> skipNext() async {
+    if (_isVoteSkipped) {
+      try {
+        await SpotifySdk.skipNext();
+      } on PlatformException catch (e) {
+        setStatus(e.code, message: e.message);
+      } on MissingPluginException {
+        setStatus('not implemented');
+      }
+    }
   }
 }
 
@@ -493,6 +581,30 @@ class _PlaybackButtonState extends State<PlaybackButton> {
 
   void _togglePlayback() {
     setState(() => _isPaused = !_isPaused);
+    pauseOrPlay();
+    playerStateWidget();
+    // ignore: invalid_use_of_protected_member
+    (context as Element).reassemble();
+  }
+
+  Future<void> pauseOrPlay() async {
+    if (_isPaused) {
+      try {
+        await SpotifySdk.resume();
+      } on PlatformException catch (e) {
+        setStatus(e.code, message: e.message);
+      } on MissingPluginException {
+        setStatus('not implemented');
+      }
+    } else {
+      try {
+        await SpotifySdk.pause();
+      } on PlatformException catch (e) {
+        setStatus(e.code, message: e.message);
+      } on MissingPluginException {
+        setStatus('not implemented');
+      }
+    }
   }
 }
 
@@ -798,4 +910,160 @@ class SlidableWidget<T> extends StatelessWidget {
               )),
         ]);
   }
+}
+
+Widget playerStateWidget() {
+  return StreamBuilder<PlayerState>(
+      stream: SpotifySdk.subscribePlayerState(),
+      initialData: PlayerState(
+        null,
+        1,
+        1,
+        null,
+        null,
+        isPaused: false,
+      ),
+      builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot) {
+        if (snapshot.data != null && snapshot.data.track != null) {
+          var playerState = snapshot.data;
+          currentImageUri = playerState.track.imageUri.raw;
+          spotifyUri = playerState.track.uri;
+          currentArtist = playerState.track.artist.name;
+          currentTitle = playerState.track.name;
+          currentAlbum = playerState.track.album.name;
+          currentSongTime = playerState.playbackPosition;
+          songLength = playerState.track.duration;
+          playbackPercent =
+              playerState.playbackPosition / playerState.track.duration;
+          return Container(width: 0.0, height: 0.0);
+        } else {
+          return Container(width: 0.0, height: 0.0);
+        }
+      });
+}
+
+Widget spotifyImageWidget() {
+  return FutureBuilder(
+      future: SpotifySdk.getImage(
+          imageUri: ImageUri(currentImageUri), dimension: ImageDimension.large),
+      builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
+        if (snapshot.hasData) {
+          imageCache.clear();
+          return Image.memory(snapshot.data, gaplessPlayback: true);
+        } else if (snapshot.hasError) {
+          setStatus(snapshot.error.toString());
+          return SizedBox(
+            width: ImageDimension.large.value.toDouble(),
+            height: ImageDimension.large.value.toDouble(),
+            child: const Center(child: Text('Error getting image')),
+          );
+        } else {
+          return SizedBox(
+            width: ImageDimension.large.value.toDouble(),
+            height: ImageDimension.large.value.toDouble(),
+            child: const Center(child: Text('Getting image...')),
+          );
+        }
+      });
+}
+
+Future getPlayerState() async {
+  try {
+    return await SpotifySdk.getPlayerState();
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+//not implemented
+Future<void> queue() async {
+  try {
+    await SpotifySdk.queue(spotifyUri: 'spotify:track:58kNJana4w5BIjlZE2wq5m');
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+Future<void> toggleRepeat() async {
+  try {
+    await SpotifySdk.toggleRepeat();
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+Future<void> setRepeatMode(RepeatMode repeatMode) async {
+  try {
+    await SpotifySdk.setRepeatMode(
+      repeatMode: repeatMode,
+    );
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+Future<void> setShuffle({bool shuffle}) async {
+  try {
+    await SpotifySdk.setShuffle(
+      shuffle: shuffle,
+    );
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+Future<void> toggleShuffle() async {
+  try {
+    await SpotifySdk.toggleShuffle();
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+//not implemented
+Future<void> play() async {
+  try {
+    await SpotifySdk.play(spotifyUri: 'spotify:track:58kNJana4w5BIjlZE2wq5m');
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+Future<void> seekTo() async {
+  try {
+    await SpotifySdk.seekTo(positionedMilliseconds: 20000);
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+Future<void> seekToRelative() async {
+  try {
+    await SpotifySdk.seekToRelativePosition(relativeMilliseconds: 20000);
+  } on PlatformException catch (e) {
+    setStatus(e.code, message: e.message);
+  } on MissingPluginException {
+    setStatus('not implemented');
+  }
+}
+
+void setStatus(String code, {String message = ''}) {
+  var text = message.isEmpty ? '' : ' : $message';
+  _logger.d('$code$text');
 }

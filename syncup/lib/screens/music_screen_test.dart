@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -8,8 +7,6 @@ import 'package:spotify_sdk/models/connection_status.dart';
 import 'package:spotify_sdk/models/image_uri.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:syncup/widgets/sized_icon_button.dart';
-import 'spotify_api_test.dart';
-import '../main.dart';
 import 'package:spotify/spotify.dart' as spotifyimport;
 import 'package:spotify_sdk/spotify_sdk.dart';
 
