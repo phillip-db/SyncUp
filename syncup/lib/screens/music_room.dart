@@ -81,7 +81,7 @@ class _MusicRoomState extends State<MusicRoom> {
               _connected = snapshot.data.connected;
             }
             return Scaffold(
-              backgroundColor: Theme.of(context).backgroundColor,
+              backgroundColor: Colors.black,
               appBar: buildAppBar(),
               endDrawer: MemberListDrawer(),
               body: Stack(children: <Widget>[
@@ -214,6 +214,7 @@ class _MusicRoomState extends State<MusicRoom> {
           child: Text(
             currentTitle,
             style: TextStyle(
+              color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
@@ -235,6 +236,8 @@ class _MusicRoomState extends State<MusicRoom> {
     return AppBar(
       centerTitle: true,
       title: Text(_roomOwner + '\'s Room'),
+      backgroundColor: Colors.grey[850],
+      shadowColor: Colors.black54,
       actions: [
         Builder(
           builder: (context) => IconButton(
@@ -277,7 +280,7 @@ class _SongSourceState extends State<SongSource> {
             direction: Axis.horizontal,
             child: Text(
               'DJ: ${widget.songSource}',
-              style: Theme.of(context).textTheme.headline4,
+              style: TextStyle(color: Colors.white, fontSize: 18),
             ),
           ),
         ),
@@ -499,8 +502,14 @@ class _PlaybackControlsState extends State<PlaybackControls> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(format(_songProgress)),
-                  Text(format(_songDuration - _songProgress)),
+                  Text(
+                    format(_songProgress),
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
+                  Text(
+                    format(_songDuration - _songProgress),
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
                 ],
               ),
               Padding(
@@ -634,6 +643,7 @@ Widget currentlyPlaying(Song song) {
                       child: MarqueeWidget(
                         child: Text(
                           song.name,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 28,
@@ -647,6 +657,7 @@ Widget currentlyPlaying(Song song) {
                       child: MarqueeWidget(
                         child: Text(
                           song.artist,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: 15,
