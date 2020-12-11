@@ -420,7 +420,7 @@ class _SongOptionsButtonState extends State<SongOptionsButton> {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      icon: Icon(Icons.more_vert),
+      icon: Icon(Icons.more_vert, color: Colors.white),
       tooltip: 'Song Options',
       onSelected: (value) {
         if (value == 3) {
@@ -474,8 +474,8 @@ class PlaybackControls extends StatefulWidget {
 }
 
 class _PlaybackControlsState extends State<PlaybackControls> {
-  Duration _songDuration = Duration(minutes: 3, seconds: 40);
-  Duration _songProgress = Duration(minutes: 2, seconds: 30);
+  Duration _songDuration = new Duration(minutes: 3, seconds: 30);
+  Duration _songProgress = new Duration(minutes: 2, seconds: 15);
 
   format(Duration d) => d.toString().substring(2, 7);
   minToSec(Duration d) => 60 * int.parse(d.toString().substring(2, 4));
@@ -581,6 +581,7 @@ class _PlaybackButtonState extends State<PlaybackButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      color: Colors.white,
       padding: EdgeInsets.all(0),
       icon: (_isPaused ? Icon(Icons.pause) : Icon(Icons.play_arrow)),
       iconSize: 40,
@@ -944,8 +945,11 @@ Widget playerStateWidget() {
           currentAlbum = playerState.track.album.name;
           currentSongTime = playerState.playbackPosition;
           songLength = playerState.track.duration;
+          print("Song Time is $currentSongTime");
+          print("Song Length is $songLength");
           playbackPercent =
               playerState.playbackPosition / playerState.track.duration;
+          print("Playback Percentage is $playbackPercent");
           return Container(width: 0.0, height: 0.0);
         } else {
           return Container(width: 0.0, height: 0.0);
